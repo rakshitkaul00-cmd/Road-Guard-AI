@@ -1,0 +1,80 @@
+{
+  "dataset_metadata": {
+    "total_records": 9000,
+    "train_records": 6000,
+    "test_records": 1500,
+    "feature_count": 8,
+    "temporal_split": "Train: Months 1-24 | Val: Months 25-30 | Test: Months 31-36",
+    "study_area": "Bengaluru Urban (BBMP)",
+    "timestamp": "2026-10-09T23:44:38.934244"
+  },
+  "models": {
+    "B0_Naive_Prior": {
+      "model_name": "Global Prior Frequency Baseline",
+      "type": "Naive Baseline",
+      "pr_auc": 0.7513,
+      "roc_auc": 0.5,
+      "brier_score": 0.2505,
+      "f1_score": 0.0,
+      "description": "Predicts constant training prevalence; standard lower bound."
+    },
+    "B_KDE_Spatial": {
+      "model_name": "2D Spatial Kernel Density Estimation (KDE)",
+      "type": "Spatial Baseline",
+      "pr_auc": 0.7338,
+      "roc_auc": 0.7954,
+      "brier_score": 0.1832,
+      "f1_score": 0.7614,
+      "description": "Spatial coordinate density only (Epanechnikov/Gaussian kernel); ignores contextual features."
+    },
+    "B_LR_LogisticRegression": {
+      "model_name": "Penalized Logistic Regression",
+      "type": "Linear Contextual Baseline",
+      "pr_auc": 0.8088,
+      "roc_auc": 0.8428,
+      "brier_score": 0.156,
+      "f1_score": 0.8063,
+      "description": "Linear feature combination with balanced class weights."
+    },
+    "M_RF_RandomForest": {
+      "model_name": "Balanced Random Forest Ensemble",
+      "type": "Tree Ensemble",
+      "pr_auc": 0.8193,
+      "roc_auc": 0.8445,
+      "brier_score": 0.1543,
+      "f1_score": 0.8089,
+      "description": "Bagged decision trees with majority subsampling."
+    },
+    "M_GBM_Calibrated": {
+      "model_name": "Histogram Gradient Boosting (Platt-Calibrated)",
+      "type": "Proposed Primary Architecture",
+      "pr_auc": 0.718,
+      "roc_auc": 0.7743,
+      "brier_score": 0.2252,
+      "f1_score": 0.741,
+      "precision": 0.6103,
+      "recall": 0.943,
+      "confusion_matrix": [
+        [
+          292,
+          454
+        ],
+        [
+          43,
+          711
+        ]
+      ],
+      "description": "Gradient boosted trees calibrated on validation set for reliable posterior probabilities."
+    }
+  },
+  "feature_importances": {
+    "road_class_encoded": 0.1043,
+    "speed_limit_kmh": 0.1555,
+    "lane_count": 0.1544,
+    "dist_nearest_junction_m": 0.0646,
+    "is_night": 0.0268,
+    "is_peak_hour": 0.0062,
+    "precipitation_active": 0.0288,
+    "historical_corridor_density": 0.4595
+  }
+}

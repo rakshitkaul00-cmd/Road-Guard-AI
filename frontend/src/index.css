@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom Leaflet Map styling for high-contrast dark command-center theme */
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+  background: #0B0F19 !important;
+  font-family: inherit;
+}
+
+/* Enhances OpenStreetMap tiles for clean contrast */
+.leaflet-tile-pane {
+  filter: brightness(0.92) contrast(1.05);
+}
+
+.leaflet-popup-content-wrapper {
+  background: #1E293B !important;
+  color: #F8FAFC !important;
+  border: 1px solid #334155 !important;
+  border-radius: 0.75rem !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5) !important;
+}
+
+.leaflet-popup-tip {
+  background: #1E293B !important;
+}
+
+.leaflet-popup-close-button {
+  color: #94A3B8 !important;
+}
+
+/* Pulsing radar effect for high-casualty blackspots */
+@keyframes pulse-ring {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  50% { transform: scale(1.3); opacity: 0.2; }
+  100% { transform: scale(0.95); opacity: 0.8; }
+}
+
+.pulse-blackspot {
+  animation: pulse-ring 2s infinite ease-in-out;
+}
