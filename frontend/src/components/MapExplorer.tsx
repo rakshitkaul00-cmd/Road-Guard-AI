@@ -95,7 +95,7 @@ export const MapExplorer: React.FC<MapExplorerProps> = ({ onSelectSegment, onOpe
   const [showBlackspots, setShowBlackspots] = useState(true);
   const [showSegments, setShowSegments] = useState(true);
   const [showHazards, setShowHazards] = useState(true);
-  const [isNightTime, setIsNightTime] = useState(1);
+  const [isNightTime, setIsNightTime] = useState(0);
   const [isRainActive, setIsRainActive] = useState(0);
 
   // Switch Tile Layer dynamically
@@ -282,7 +282,7 @@ export const MapExplorer: React.FC<MapExplorerProps> = ({ onSelectSegment, onOpe
               name: p.road_name,
               category: 'Road Corridor',
               coords,
-              desc: `${p.road_class?.toUpperCase() || 'PRIMARY'} • ${p.speed_limit_kmh || 50} km/h • Risk: ${Math.round((p.calibrated_risk || 0.3) * 100)}%`
+              desc: `${p.road_class?.toUpperCase() || 'PRIMARY'} • ${p.speed_limit_kmh || 50} km/h • Risk: ${Math.round(((p.calibrated_risk_probability ?? p.calibrated_risk) || 0.25) * 100)}%`
             });
           }
         }
@@ -353,51 +353,106 @@ export const MapExplorer: React.FC<MapExplorerProps> = ({ onSelectSegment, onOpe
           radius: p.buffer_radius_m || 500,
           color: '#FF2E5B',
           weight: 1.5,
-          opacity: 0.8,
+          opacity: 0.65,
           fillColor: '#FF2E5B',
-          fillOpacity: 0.12,
-          dashArray: '6, 6'
+          fillOpacity: 0.08,
+          dashArray: '6, 8'
         });
 
-        // Pulsing core marker
-        const marker = L.circleMarker([lat, lon], {
-          radius: 9,
-          color: '#FFFFFF',
-          weight: 2,
-          fillColor: '#FF2E5B',
-          fillOpacity: 1.0
+        // Tactical double-pulse radar marker
+        const customIcon = L.divIcon({
+          className: 'tactical-blackspot-icon',
+          html: `
+            <div class="relative flex items-center justify-center">
+              <span class="absolute w-8 h-8 rounded-full bg-rose-500/30 radar-ping"></span>
+              <span class="relative w-4 h-4 rounded-full bg-[#FF2E5B] border-2 border-white shadow-lg flex items-center justify-center">
+                <span class="w-1.5 h-1.5 rounded-full bg-white"></span>
+              </span>
+            </div>
+          `,
+          iconSize: [32, 32],
+          iconAnchor: [16, 16]
         });
 
-        marker.bindPopup(`
-          <div style="font-family: sans-serif; font-size: 12px; color: #f8fafc; background: #08090D; padding: 8px 12px; border-radius: 12px; border: 1px solid #FF2E5B; min-width: 200px;">
-            <div style="font-size: 10px; font-weight: bold; color: #FF2E5B; text-transform: uppercase;">● Priority BTP Crash Blackspot</div>
-            <div style="font-size: 14px; font-weight: bold; margin-top: 2px;">${p.blackspot_name || 'Designated Hotzone'}</div>
-            <div style="font-size: 11px; color: #94a3b8; margin-top: 4px;">Corridor: ${p.corridor_name || 'Bengaluru Arterial'}</div>
-            <div style="font-size: 11px; color: #f43f5e; margin-top: 2px;">Fatalities (3-Yr): <strong>${p.total_fatalities_3yr || 12}</strong> | Severe Injuries: <strong>${p.total_grievous_injuries_3yr || 24}</strong></div>
+        const marker = L.marker([lat, lon], { icon: customIcon });
+
+        const blackspotName = p.blackspot_name || p.junction_name || 'Designated Hotzone';
+        const fatalCount = p.total_fatalities_3yr ?? p.fatal_count_3yr ?? 14;
+        const injuryCount = p.total_grievous_injuries_3yr ?? p.injury_count_3yr ?? 28;
+
+        const popupContent = `
+          <div style="font-family: sans-serif; font-size: 12px; color: #f8fafc; background: #08090D; padding: 12px 14px; border-radius: 14px; border: 1px solid #FF2E5B; min-width: 230px; box-shadow: 0 10px 25px rgba(0,0,0,0.8);">
+            <div style="font-size: 10px; font-weight: bold; color: #FF2E5B; text-transform: uppercase; display: flex; align-items: center; justify-content: space-between;">
+              <span>● BTP Official Blackspot</span>
+              <span style="font-family: monospace; color: #94a3b8;">#${p.id || p.blackspot_id || 1}</span>
+            </div>
+            <div style="font-size: 14px; font-weight: 800; margin-top: 4px; color: #ffffff;">${blackspotName}</div>
+            <div style="font-size: 11px; color: #94a3b8; margin-top: 2px;">${p.corridor_name || 'Bengaluru Arterial'}</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 8px;">
+              <div style="background: rgba(255,46,91,0.12); border: 1px solid rgba(255,46,91,0.25); border-radius: 8px; padding: 4px 6px; text-align: center;">
+                <span style="display: block; font-size: 9px; color: #fda4af; text-transform: uppercase;">Fatalities (3-Yr)</span>
+                <span style="font-size: 14px; font-weight: 800; color: #f43f5e;">${fatalCount}</span>
+              </div>
+              <div style="background: rgba(255,184,0,0.12); border: 1px solid rgba(255,184,0,0.25); border-radius: 8px; padding: 4px 6px; text-align: center;">
+                <span style="display: block; font-size: 9px; color: #fde68a; text-transform: uppercase;">Injuries (3-Yr)</span>
+                <span style="font-size: 14px; font-weight: 800; color: #fbbf24;">${injuryCount}</span>
+              </div>
+            </div>
+            ${p.primary_hazard_cause ? `<div style="font-size: 10px; color: #cbd5e1; margin-top: 8px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.08); line-height: 1.3;"><strong style="color: #e2e8f0;">Cause:</strong> ${p.primary_hazard_cause}</div>` : ''}
           </div>
-        `);
+        `;
+
+        marker.bindPopup(popupContent);
+        bufferCircle.bindPopup(popupContent);
 
         blackspots.addLayer(bufferCircle);
         blackspots.addLayer(marker);
       }
 
-      // 2. OSM Highway Links / Segments
+      // 2. OSM Highway Links / Segments (Platt Calibrated Color Separation)
       if (p.layer_type === 'road_segment' && showSegments) {
-        let prob = p.calibrated_risk || 0.25;
-        if (isNightTime) prob += 0.10;
-        if (isRainActive) prob += 0.12;
+        // Extract base risk probability
+        let baseProb = typeof p.calibrated_risk_probability === 'number'
+          ? p.calibrated_risk_probability
+          : typeof p.calibrated_risk === 'number'
+            ? p.calibrated_risk
+            : (p.risk_tier === 'ELEVATED' || p.is_blackspot_corridor ? 0.68 : p.risk_tier === 'MODERATE' ? 0.42 : 0.22);
+
+        // Real-time environmental context modulation
+        let prob = baseProb;
+        if (isNightTime && !p.is_blackspot_corridor) {
+          prob = Math.min(0.95, prob + 0.10);
+        }
+        if (isRainActive) {
+          prob = Math.min(0.95, prob + 0.12);
+        }
         prob = Math.min(0.95, Math.max(0.05, prob));
 
-        let color = '#00F59B'; // Mint (< 28%)
-        if (prob >= 0.58) color = '#FF2E5B'; // Coral Crimson (>= 58%)
-        else if (prob >= 0.28) color = '#FFB800'; // Solar Amber (28-58%)
+        // High-Contrast 3-Color Separation: Green (#00F59B), Yellow (#FFB800), Red (#FF2E5B)
+        let color = '#00F59B'; // Mint Aurora (< 28%)
+        let tierLabel = 'Low Exposure';
+        let weight = 4.5;
+
+        if (prob >= 0.58 || p.risk_tier === 'ELEVATED' || p.is_blackspot_corridor) {
+          color = '#FF2E5B'; // Coral Crimson (>= 58%)
+          tierLabel = 'Critical Blackspot';
+          weight = 6.0;
+        } else if (prob >= 0.28 || p.risk_tier === 'MODERATE') {
+          color = '#FFB800'; // Solar Amber (28–58%)
+          tierLabel = 'Moderate Hazard';
+          weight = 5.0;
+        } else {
+          color = '#00F59B'; // Vibrant Mint Green (< 28%)
+          tierLabel = 'Low Exposure';
+          weight = 4.5;
+        }
 
         const latLngs = feature.geometry.coordinates.map((coord: [number, number]) => [coord[1], coord[0]]);
 
         const polyline = L.polyline(latLngs, {
           color: color,
-          weight: prob >= 0.58 ? 6 : 4,
-          opacity: 0.9,
+          weight: weight,
+          opacity: 0.94,
           lineCap: 'round',
           lineJoin: 'round'
         });
@@ -407,32 +462,61 @@ export const MapExplorer: React.FC<MapExplorerProps> = ({ onSelectSegment, onOpe
         });
 
         polyline.bindTooltip(`
-          <div style="font-family: sans-serif; font-size: 11px; padding: 2px 6px;">
-            <strong>${p.road_name || 'Highway Link'}</strong><br/>
-            Risk Probability: <strong>${Math.round(prob * 100)}%</strong> (${prob >= 0.58 ? 'Critical' : prob >= 0.28 ? 'Moderate' : 'Low'})
+          <div style="font-family: sans-serif; font-size: 11px; padding: 4px 8px; color: #f8fafc; background: #08090D; border: 1px solid rgba(255,255,255,0.15); border-radius: 8px;">
+            <div style="font-weight: 700; font-size: 12px; color: #ffffff; margin-bottom: 2px;">${p.road_name || 'Highway Link'}</div>
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+              <span style="color: #94a3b8; text-transform: capitalize;">${p.road_class || 'Arterial'} • ${p.speed_limit_kmh || 50} km/h</span>
+              <span style="font-weight: 800; font-family: monospace; padding: 2px 6px; border-radius: 4px; background: ${color}25; color: ${color};">
+                ${Math.round(prob * 100)}% (${tierLabel})
+              </span>
+            </div>
+            <div style="font-size: 10px; color: #38bdf8; margin-top: 4px; padding-top: 4px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between;">
+              <span>Click to inspect local SHAP card</span>
+              <span style="font-family: monospace;">#${p.segment_id}</span>
+            </div>
           </div>
-        `, { sticky: true });
+        `, { sticky: true, opacity: 0.96 });
 
         segments.addLayer(polyline);
       }
 
-      // 3. Crowdsourced Citizen Hazard Points
+      // 3. Crowdsourced Citizen Hazard Points (Crisp, Distinct Markers)
       if (p.layer_type === 'citizen_hazard' && showHazards) {
         const [lon, lat] = feature.geometry.coordinates;
+
+        // Distinct type-based coloring
+        const hazardColors: Record<string, string> = {
+          'POTHOLE': '#F59E0B',        // Solar Amber
+          'SIGNAL': '#EF4444',         // Red
+          'STREETLIGHT': '#818CF8',    // Indigo
+          'WATERLOGGING': '#0EA5E9',   // Sky Cyan
+          'HAZARDOUS_MEDIAN': '#A855F7' // Purple
+        };
+        const hazardColor = p.color || hazardColors[p.hazard_type] || (p.status === 'VERIFIED' ? '#00F59B' : '#FFB800');
+
         const marker = L.circleMarker([lat, lon], {
-          radius: 6,
-          color: '#FFB800',
-          weight: 2,
-          fillColor: '#FFB800',
-          fillOpacity: 0.85
+          radius: 4.5,
+          color: '#FFFFFF',
+          weight: 1.5,
+          fillColor: hazardColor,
+          fillOpacity: 0.88
         });
 
+        const statusBadge = p.status === 'VERIFIED'
+          ? '<span style="font-size: 9px; font-weight: bold; padding: 2px 6px; border-radius: 4px; background: rgba(0,245,155,0.18); color: #00F59B; border: 1px solid rgba(0,245,155,0.35);">VERIFIED</span>'
+          : '<span style="font-size: 9px; font-weight: bold; padding: 2px 6px; border-radius: 4px; background: rgba(255,184,0,0.18); color: #FFB800; border: 1px solid rgba(255,184,0,0.35);">COMMUNITY</span>';
+
         marker.bindPopup(`
-          <div style="font-family: sans-serif; font-size: 12px; color: #f8fafc; background: #08090D; padding: 8px 12px; border-radius: 12px; border: 1px solid #FFB800; min-width: 180px;">
-            <div style="font-size: 10px; font-weight: bold; color: #FFB800; text-transform: uppercase;">⚠️ Verified Road Hazard</div>
-            <div style="font-size: 13px; font-weight: bold; margin-top: 2px;">${p.hazard_type || 'Pothole / Road Obstruction'}</div>
-            <div style="font-size: 11px; color: #94a3b8; margin-top: 4px;">${p.description || 'Reported by commuter'}</div>
-            <div style="font-size: 10px; color: #cbd5e1; margin-top: 4px;">Severity: ${p.severity || 3}/5 • Corroborations: ${p.corroborations || 1}</div>
+          <div style="font-family: sans-serif; font-size: 12px; color: #f8fafc; background: #08090D; padding: 10px 14px; border-radius: 12px; border: 1px solid ${hazardColor}50; min-width: 200px; box-shadow: 0 10px 25px rgba(0,0,0,0.8);">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+              <span style="font-size: 10px; font-weight: bold; color: ${hazardColor}; text-transform: uppercase;">⚠️ ${p.hazard_type || 'Road Hazard'}</span>
+              ${statusBadge}
+            </div>
+            <div style="font-size: 11px; color: #cbd5e1; margin-top: 4px; line-height: 1.4;">${p.description || 'Reported by commuter'}</div>
+            <div style="font-size: 10px; color: #94a3b8; margin-top: 8px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between;">
+              <span>Severity: <strong style="color: #f1f5f9;">${p.severity_rating || p.severity || 3}/5</strong></span>
+              <span>Corroborations: <strong style="color: #f1f5f9;">${p.corroboration_count || p.corroborations || 1}</strong></span>
+            </div>
           </div>
         `);
 
@@ -443,8 +527,8 @@ export const MapExplorer: React.FC<MapExplorerProps> = ({ onSelectSegment, onOpe
 
   return (
     <div className="relative w-full h-[calc(100vh-68px)] overflow-hidden font-sans">
-      {/* Map Canvas */}
-      <div ref={mapContainerRef} className="w-full h-full z-0 bg-[#08090D]" />
+      {/* Map Canvas with Obsidian Cyberpunk Theme */}
+      <div ref={mapContainerRef} className={`w-full h-full z-0 bg-[#08090D] map-theme-${basemapStyle}`} />
 
       {/* Loading Radar Overlay */}
       {loading && (

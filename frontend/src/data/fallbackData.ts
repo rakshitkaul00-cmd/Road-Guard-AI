@@ -424,7 +424,7 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "speed_limit_kmh": 60,
         "lane_count": 4,
         "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.615,
+        "calibrated_risk_probability": 0.705,
         "risk_tier": "ELEVATED",
         "color": "#EF4444"
       }
@@ -454,7 +454,7 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "speed_limit_kmh": 80,
         "lane_count": 6,
         "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.63,
+        "calibrated_risk_probability": 0.685,
         "risk_tier": "ELEVATED",
         "color": "#EF4444"
       }
@@ -484,7 +484,7 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "speed_limit_kmh": 80,
         "lane_count": 6,
         "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.661,
+        "calibrated_risk_probability": 0.665,
         "risk_tier": "ELEVATED",
         "color": "#EF4444"
       }
@@ -514,7 +514,7 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "speed_limit_kmh": 60,
         "lane_count": 4,
         "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.609,
+        "calibrated_risk_probability": 0.645,
         "risk_tier": "ELEVATED",
         "color": "#EF4444"
       }
@@ -543,10 +543,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "trunk",
         "speed_limit_kmh": 60,
         "lane_count": 4,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.643,
-        "risk_tier": "ELEVATED",
-        "color": "#EF4444"
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.455,
+        "risk_tier": "MODERATE",
+        "color": "#F59E0B"
       }
     },
     {
@@ -573,10 +573,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "trunk",
         "speed_limit_kmh": 60,
         "lane_count": 4,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.608,
-        "risk_tier": "ELEVATED",
-        "color": "#EF4444"
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.405,
+        "risk_tier": "MODERATE",
+        "color": "#F59E0B"
       }
     },
     {
@@ -603,10 +603,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "trunk",
         "speed_limit_kmh": 60,
         "lane_count": 4,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.601,
-        "risk_tier": "ELEVATED",
-        "color": "#EF4444"
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.435,
+        "risk_tier": "MODERATE",
+        "color": "#F59E0B"
       }
     },
     {
@@ -633,10 +633,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "motorway",
         "speed_limit_kmh": 80,
         "lane_count": 6,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.602,
-        "risk_tier": "ELEVATED",
-        "color": "#EF4444"
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.244,
+        "risk_tier": "LOW",
+        "color": "#10B981"
       }
     },
     {
@@ -663,10 +663,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "motorway",
         "speed_limit_kmh": 80,
         "lane_count": 6,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.63,
-        "risk_tier": "ELEVATED",
-        "color": "#EF4444"
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.235,
+        "risk_tier": "LOW",
+        "color": "#10B981"
       }
     },
     {
@@ -693,10 +693,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "motorway",
         "speed_limit_kmh": 80,
         "lane_count": 6,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.623,
-        "risk_tier": "ELEVATED",
-        "color": "#EF4444"
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.226,
+        "risk_tier": "LOW",
+        "color": "#10B981"
       }
     },
     {
@@ -724,7 +724,7 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "speed_limit_kmh": 60,
         "lane_count": 4,
         "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.626,
+        "calibrated_risk_probability": 0.685,
         "risk_tier": "ELEVATED",
         "color": "#EF4444"
       }
@@ -754,7 +754,7 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "speed_limit_kmh": 80,
         "lane_count": 6,
         "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.625,
+        "calibrated_risk_probability": 0.665,
         "risk_tier": "ELEVATED",
         "color": "#EF4444"
       }
@@ -784,7 +784,7 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "speed_limit_kmh": 60,
         "lane_count": 4,
         "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.602,
+        "calibrated_risk_probability": 0.645,
         "risk_tier": "ELEVATED",
         "color": "#EF4444"
       }
@@ -814,7 +814,7 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "speed_limit_kmh": 60,
         "lane_count": 4,
         "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.641,
+        "calibrated_risk_probability": 0.715,
         "risk_tier": "ELEVATED",
         "color": "#EF4444"
       }
@@ -843,8 +843,8 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "motorway",
         "speed_limit_kmh": 80,
         "lane_count": 6,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.573,
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.435,
         "risk_tier": "MODERATE",
         "color": "#F59E0B"
       }
@@ -873,10 +873,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "motorway",
         "speed_limit_kmh": 80,
         "lane_count": 6,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.626,
-        "risk_tier": "ELEVATED",
-        "color": "#EF4444"
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.385,
+        "risk_tier": "MODERATE",
+        "color": "#F59E0B"
       }
     },
     {
@@ -903,10 +903,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "motorway",
         "speed_limit_kmh": 80,
         "lane_count": 6,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.632,
-        "risk_tier": "ELEVATED",
-        "color": "#EF4444"
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.415,
+        "risk_tier": "MODERATE",
+        "color": "#F59E0B"
       }
     },
     {
@@ -933,10 +933,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "motorway",
         "speed_limit_kmh": 80,
         "lane_count": 6,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.622,
-        "risk_tier": "ELEVATED",
-        "color": "#EF4444"
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.217,
+        "risk_tier": "LOW",
+        "color": "#10B981"
       }
     },
     {
@@ -964,9 +964,9 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "speed_limit_kmh": 60,
         "lane_count": 4,
         "is_blackspot_corridor": false,
-        "calibrated_risk_probability": 0.581,
-        "risk_tier": "ELEVATED",
-        "color": "#EF4444"
+        "calibrated_risk_probability": 0.208,
+        "risk_tier": "LOW",
+        "color": "#10B981"
       }
     },
     {
@@ -994,9 +994,9 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "speed_limit_kmh": 60,
         "lane_count": 4,
         "is_blackspot_corridor": false,
-        "calibrated_risk_probability": 0.596,
-        "risk_tier": "ELEVATED",
-        "color": "#EF4444"
+        "calibrated_risk_probability": 0.199,
+        "risk_tier": "LOW",
+        "color": "#10B981"
       }
     },
     {
@@ -1024,7 +1024,7 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "speed_limit_kmh": 80,
         "lane_count": 6,
         "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.635,
+        "calibrated_risk_probability": 0.665,
         "risk_tier": "ELEVATED",
         "color": "#EF4444"
       }
@@ -1054,7 +1054,7 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "speed_limit_kmh": 60,
         "lane_count": 4,
         "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.595,
+        "calibrated_risk_probability": 0.645,
         "risk_tier": "ELEVATED",
         "color": "#EF4444"
       }
@@ -1084,7 +1084,7 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "speed_limit_kmh": 80,
         "lane_count": 6,
         "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.628,
+        "calibrated_risk_probability": 0.715,
         "risk_tier": "ELEVATED",
         "color": "#EF4444"
       }
@@ -1114,7 +1114,7 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "speed_limit_kmh": 80,
         "lane_count": 6,
         "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.635,
+        "calibrated_risk_probability": 0.695,
         "risk_tier": "ELEVATED",
         "color": "#EF4444"
       }
@@ -1143,10 +1143,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "motorway",
         "speed_limit_kmh": 80,
         "lane_count": 6,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.634,
-        "risk_tier": "ELEVATED",
-        "color": "#EF4444"
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.415,
+        "risk_tier": "MODERATE",
+        "color": "#F59E0B"
       }
     },
     {
@@ -1173,10 +1173,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "motorway",
         "speed_limit_kmh": 80,
         "lane_count": 6,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.598,
-        "risk_tier": "ELEVATED",
-        "color": "#EF4444"
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.445,
+        "risk_tier": "MODERATE",
+        "color": "#F59E0B"
       }
     },
     {
@@ -1203,10 +1203,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "motorway",
         "speed_limit_kmh": 80,
         "lane_count": 6,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.605,
-        "risk_tier": "ELEVATED",
-        "color": "#EF4444"
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.395,
+        "risk_tier": "MODERATE",
+        "color": "#F59E0B"
       }
     },
     {
@@ -1233,10 +1233,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "motorway",
         "speed_limit_kmh": 80,
         "lane_count": 6,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.621,
-        "risk_tier": "ELEVATED",
-        "color": "#EF4444"
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.19,
+        "risk_tier": "LOW",
+        "color": "#10B981"
       }
     },
     {
@@ -1263,10 +1263,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "trunk",
         "speed_limit_kmh": 60,
         "lane_count": 4,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.63,
-        "risk_tier": "ELEVATED",
-        "color": "#EF4444"
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.244,
+        "risk_tier": "LOW",
+        "color": "#10B981"
       }
     },
     {
@@ -1293,10 +1293,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "trunk",
         "speed_limit_kmh": 60,
         "lane_count": 4,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.603,
-        "risk_tier": "ELEVATED",
-        "color": "#EF4444"
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.235,
+        "risk_tier": "LOW",
+        "color": "#10B981"
       }
     },
     {
@@ -1324,7 +1324,7 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "speed_limit_kmh": 60,
         "lane_count": 4,
         "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.596,
+        "calibrated_risk_probability": 0.645,
         "risk_tier": "ELEVATED",
         "color": "#EF4444"
       }
@@ -1354,7 +1354,7 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "speed_limit_kmh": 60,
         "lane_count": 4,
         "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.6,
+        "calibrated_risk_probability": 0.715,
         "risk_tier": "ELEVATED",
         "color": "#EF4444"
       }
@@ -1384,7 +1384,7 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "speed_limit_kmh": 60,
         "lane_count": 4,
         "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.601,
+        "calibrated_risk_probability": 0.695,
         "risk_tier": "ELEVATED",
         "color": "#EF4444"
       }
@@ -1414,7 +1414,7 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "speed_limit_kmh": 60,
         "lane_count": 4,
         "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.622,
+        "calibrated_risk_probability": 0.675,
         "risk_tier": "ELEVATED",
         "color": "#EF4444"
       }
@@ -1443,10 +1443,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "trunk",
         "speed_limit_kmh": 60,
         "lane_count": 4,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.667,
-        "risk_tier": "ELEVATED",
-        "color": "#EF4444"
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.395,
+        "risk_tier": "MODERATE",
+        "color": "#F59E0B"
       }
     },
     {
@@ -1473,10 +1473,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "trunk",
         "speed_limit_kmh": 60,
         "lane_count": 4,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.708,
-        "risk_tier": "ELEVATED",
-        "color": "#EF4444"
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.425,
+        "risk_tier": "MODERATE",
+        "color": "#F59E0B"
       }
     },
     {
@@ -1503,10 +1503,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "trunk",
         "speed_limit_kmh": 60,
         "lane_count": 4,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.697,
-        "risk_tier": "ELEVATED",
-        "color": "#EF4444"
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.455,
+        "risk_tier": "MODERATE",
+        "color": "#F59E0B"
       }
     },
     {
@@ -1533,10 +1533,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "trunk",
         "speed_limit_kmh": 60,
         "lane_count": 4,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.589,
-        "risk_tier": "ELEVATED",
-        "color": "#EF4444"
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.226,
+        "risk_tier": "LOW",
+        "color": "#10B981"
       }
     },
     {
@@ -1563,10 +1563,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "trunk",
         "speed_limit_kmh": 60,
         "lane_count": 4,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.636,
-        "risk_tier": "ELEVATED",
-        "color": "#EF4444"
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.217,
+        "risk_tier": "LOW",
+        "color": "#10B981"
       }
     },
     {
@@ -1593,10 +1593,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "trunk",
         "speed_limit_kmh": 60,
         "lane_count": 4,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.651,
-        "risk_tier": "ELEVATED",
-        "color": "#EF4444"
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.208,
+        "risk_tier": "LOW",
+        "color": "#10B981"
       }
     },
     {
@@ -1624,7 +1624,7 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "speed_limit_kmh": 60,
         "lane_count": 6,
         "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.696,
+        "calibrated_risk_probability": 0.715,
         "risk_tier": "ELEVATED",
         "color": "#EF4444"
       }
@@ -1654,7 +1654,7 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "speed_limit_kmh": 60,
         "lane_count": 6,
         "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.681,
+        "calibrated_risk_probability": 0.695,
         "risk_tier": "ELEVATED",
         "color": "#EF4444"
       }
@@ -1684,7 +1684,7 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "speed_limit_kmh": 60,
         "lane_count": 6,
         "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.688,
+        "calibrated_risk_probability": 0.675,
         "risk_tier": "ELEVATED",
         "color": "#EF4444"
       }
@@ -1713,8 +1713,8 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "trunk",
         "speed_limit_kmh": 60,
         "lane_count": 6,
-        "is_blackspot_corridor": false,
-        "calibrated_risk_probability": 0.677,
+        "is_blackspot_corridor": true,
+        "calibrated_risk_probability": 0.655,
         "risk_tier": "ELEVATED",
         "color": "#EF4444"
       }
@@ -1743,10 +1743,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "primary",
         "speed_limit_kmh": 50,
         "lane_count": 4,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.665,
-        "risk_tier": "ELEVATED",
-        "color": "#EF4444"
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.455,
+        "risk_tier": "MODERATE",
+        "color": "#F59E0B"
       }
     },
     {
@@ -1773,10 +1773,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "trunk",
         "speed_limit_kmh": 60,
         "lane_count": 6,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.709,
-        "risk_tier": "ELEVATED",
-        "color": "#EF4444"
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.405,
+        "risk_tier": "MODERATE",
+        "color": "#F59E0B"
       }
     },
     {
@@ -1803,10 +1803,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "primary",
         "speed_limit_kmh": 50,
         "lane_count": 4,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.708,
-        "risk_tier": "ELEVATED",
-        "color": "#EF4444"
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.435,
+        "risk_tier": "MODERATE",
+        "color": "#F59E0B"
       }
     },
     {
@@ -1833,10 +1833,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "primary",
         "speed_limit_kmh": 50,
         "lane_count": 4,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.671,
-        "risk_tier": "ELEVATED",
-        "color": "#EF4444"
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.199,
+        "risk_tier": "LOW",
+        "color": "#10B981"
       }
     },
     {
@@ -1863,10 +1863,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "primary",
         "speed_limit_kmh": 50,
         "lane_count": 4,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.694,
-        "risk_tier": "ELEVATED",
-        "color": "#EF4444"
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.19,
+        "risk_tier": "LOW",
+        "color": "#10B981"
       }
     },
     {
@@ -1893,10 +1893,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "trunk",
         "speed_limit_kmh": 60,
         "lane_count": 6,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.712,
-        "risk_tier": "ELEVATED",
-        "color": "#EF4444"
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.244,
+        "risk_tier": "LOW",
+        "color": "#10B981"
       }
     },
     {
@@ -1924,7 +1924,7 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "speed_limit_kmh": 60,
         "lane_count": 6,
         "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.7,
+        "calibrated_risk_probability": 0.695,
         "risk_tier": "ELEVATED",
         "color": "#EF4444"
       }
@@ -1953,8 +1953,8 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "primary",
         "speed_limit_kmh": 50,
         "lane_count": 4,
-        "is_blackspot_corridor": false,
-        "calibrated_risk_probability": 0.591,
+        "is_blackspot_corridor": true,
+        "calibrated_risk_probability": 0.675,
         "risk_tier": "ELEVATED",
         "color": "#EF4444"
       }
@@ -1984,7 +1984,7 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "speed_limit_kmh": 50,
         "lane_count": 4,
         "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.694,
+        "calibrated_risk_probability": 0.655,
         "risk_tier": "ELEVATED",
         "color": "#EF4444"
       }
@@ -2013,10 +2013,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "primary",
         "speed_limit_kmh": 50,
         "lane_count": 4,
-        "is_blackspot_corridor": false,
-        "calibrated_risk_probability": 0.571,
-        "risk_tier": "MODERATE",
-        "color": "#F59E0B"
+        "is_blackspot_corridor": true,
+        "calibrated_risk_probability": 0.635,
+        "risk_tier": "ELEVATED",
+        "color": "#EF4444"
       }
     },
     {
@@ -2043,10 +2043,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "primary",
         "speed_limit_kmh": 50,
         "lane_count": 4,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.609,
-        "risk_tier": "ELEVATED",
-        "color": "#EF4444"
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.435,
+        "risk_tier": "MODERATE",
+        "color": "#F59E0B"
       }
     },
     {
@@ -2073,10 +2073,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "primary",
         "speed_limit_kmh": 50,
         "lane_count": 4,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.641,
-        "risk_tier": "ELEVATED",
-        "color": "#EF4444"
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.385,
+        "risk_tier": "MODERATE",
+        "color": "#F59E0B"
       }
     },
     {
@@ -2103,10 +2103,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "primary",
         "speed_limit_kmh": 50,
         "lane_count": 4,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.699,
-        "risk_tier": "ELEVATED",
-        "color": "#EF4444"
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.415,
+        "risk_tier": "MODERATE",
+        "color": "#F59E0B"
       }
     },
     {
@@ -2133,10 +2133,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "primary",
         "speed_limit_kmh": 50,
         "lane_count": 4,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.693,
-        "risk_tier": "ELEVATED",
-        "color": "#EF4444"
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.235,
+        "risk_tier": "LOW",
+        "color": "#10B981"
       }
     },
     {
@@ -2163,10 +2163,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "primary",
         "speed_limit_kmh": 50,
         "lane_count": 4,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.732,
-        "risk_tier": "ELEVATED",
-        "color": "#EF4444"
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.226,
+        "risk_tier": "LOW",
+        "color": "#10B981"
       }
     },
     {
@@ -2193,10 +2193,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "trunk",
         "speed_limit_kmh": 60,
         "lane_count": 6,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.673,
-        "risk_tier": "ELEVATED",
-        "color": "#EF4444"
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.217,
+        "risk_tier": "LOW",
+        "color": "#10B981"
       }
     },
     {
@@ -2224,7 +2224,7 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "speed_limit_kmh": 60,
         "lane_count": 6,
         "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.71,
+        "calibrated_risk_probability": 0.675,
         "risk_tier": "ELEVATED",
         "color": "#EF4444"
       }
@@ -2254,7 +2254,7 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "speed_limit_kmh": 50,
         "lane_count": 4,
         "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.691,
+        "calibrated_risk_probability": 0.655,
         "risk_tier": "ELEVATED",
         "color": "#EF4444"
       }
@@ -2284,7 +2284,7 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "speed_limit_kmh": 50,
         "lane_count": 4,
         "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.619,
+        "calibrated_risk_probability": 0.635,
         "risk_tier": "ELEVATED",
         "color": "#EF4444"
       }
@@ -2313,8 +2313,8 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "trunk",
         "speed_limit_kmh": 60,
         "lane_count": 6,
-        "is_blackspot_corridor": false,
-        "calibrated_risk_probability": 0.645,
+        "is_blackspot_corridor": true,
+        "calibrated_risk_probability": 0.705,
         "risk_tier": "ELEVATED",
         "color": "#EF4444"
       }
@@ -2343,10 +2343,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "primary",
         "speed_limit_kmh": 50,
         "lane_count": 4,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.665,
-        "risk_tier": "ELEVATED",
-        "color": "#EF4444"
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.415,
+        "risk_tier": "MODERATE",
+        "color": "#F59E0B"
       }
     },
     {
@@ -2373,10 +2373,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "trunk",
         "speed_limit_kmh": 60,
         "lane_count": 6,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.676,
-        "risk_tier": "ELEVATED",
-        "color": "#EF4444"
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.445,
+        "risk_tier": "MODERATE",
+        "color": "#F59E0B"
       }
     },
     {
@@ -2403,10 +2403,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "primary",
         "speed_limit_kmh": 50,
         "lane_count": 4,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.704,
-        "risk_tier": "ELEVATED",
-        "color": "#EF4444"
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.395,
+        "risk_tier": "MODERATE",
+        "color": "#F59E0B"
       }
     },
     {
@@ -2434,9 +2434,9 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "speed_limit_kmh": 60,
         "lane_count": 6,
         "is_blackspot_corridor": false,
-        "calibrated_risk_probability": 0.649,
-        "risk_tier": "ELEVATED",
-        "color": "#EF4444"
+        "calibrated_risk_probability": 0.208,
+        "risk_tier": "LOW",
+        "color": "#10B981"
       }
     },
     {
@@ -2463,10 +2463,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "primary",
         "speed_limit_kmh": 50,
         "lane_count": 4,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.699,
-        "risk_tier": "ELEVATED",
-        "color": "#EF4444"
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.199,
+        "risk_tier": "LOW",
+        "color": "#10B981"
       }
     },
     {
@@ -2493,10 +2493,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "primary",
         "speed_limit_kmh": 50,
         "lane_count": 4,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.614,
-        "risk_tier": "ELEVATED",
-        "color": "#EF4444"
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.19,
+        "risk_tier": "LOW",
+        "color": "#10B981"
       }
     },
     {
@@ -2524,7 +2524,7 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "speed_limit_kmh": 50,
         "lane_count": 4,
         "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.63,
+        "calibrated_risk_probability": 0.655,
         "risk_tier": "ELEVATED",
         "color": "#EF4444"
       }
@@ -2554,7 +2554,7 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "speed_limit_kmh": 60,
         "lane_count": 6,
         "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.604,
+        "calibrated_risk_probability": 0.635,
         "risk_tier": "ELEVATED",
         "color": "#EF4444"
       }
@@ -2584,7 +2584,7 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "speed_limit_kmh": 60,
         "lane_count": 6,
         "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.586,
+        "calibrated_risk_probability": 0.705,
         "risk_tier": "ELEVATED",
         "color": "#EF4444"
       }
@@ -2614,9 +2614,9 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "speed_limit_kmh": 50,
         "lane_count": 4,
         "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.522,
-        "risk_tier": "MODERATE",
-        "color": "#F59E0B"
+        "calibrated_risk_probability": 0.685,
+        "risk_tier": "ELEVATED",
+        "color": "#EF4444"
       }
     },
     {
@@ -2643,10 +2643,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "primary",
         "speed_limit_kmh": 50,
         "lane_count": 4,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.628,
-        "risk_tier": "ELEVATED",
-        "color": "#EF4444"
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.395,
+        "risk_tier": "MODERATE",
+        "color": "#F59E0B"
       }
     },
     {
@@ -2673,10 +2673,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "trunk",
         "speed_limit_kmh": 60,
         "lane_count": 6,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.596,
-        "risk_tier": "ELEVATED",
-        "color": "#EF4444"
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.425,
+        "risk_tier": "MODERATE",
+        "color": "#F59E0B"
       }
     },
     {
@@ -2703,10 +2703,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "trunk",
         "speed_limit_kmh": 60,
         "lane_count": 6,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.586,
-        "risk_tier": "ELEVATED",
-        "color": "#EF4444"
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.455,
+        "risk_tier": "MODERATE",
+        "color": "#F59E0B"
       }
     },
     {
@@ -2733,10 +2733,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "trunk",
         "speed_limit_kmh": 60,
         "lane_count": 6,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.608,
-        "risk_tier": "ELEVATED",
-        "color": "#EF4444"
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.244,
+        "risk_tier": "LOW",
+        "color": "#10B981"
       }
     },
     {
@@ -2763,10 +2763,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "primary",
         "speed_limit_kmh": 50,
         "lane_count": 4,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.598,
-        "risk_tier": "ELEVATED",
-        "color": "#EF4444"
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.235,
+        "risk_tier": "LOW",
+        "color": "#10B981"
       }
     },
     {
@@ -2793,10 +2793,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "primary",
         "speed_limit_kmh": 50,
         "lane_count": 4,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.654,
-        "risk_tier": "ELEVATED",
-        "color": "#EF4444"
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.226,
+        "risk_tier": "LOW",
+        "color": "#10B981"
       }
     },
     {
@@ -2824,9 +2824,9 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "speed_limit_kmh": 60,
         "lane_count": 4,
         "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.541,
-        "risk_tier": "MODERATE",
-        "color": "#F59E0B"
+        "calibrated_risk_probability": 0.635,
+        "risk_tier": "ELEVATED",
+        "color": "#EF4444"
       }
     },
     {
@@ -2854,9 +2854,9 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "speed_limit_kmh": 80,
         "lane_count": 6,
         "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.565,
-        "risk_tier": "MODERATE",
-        "color": "#F59E0B"
+        "calibrated_risk_probability": 0.705,
+        "risk_tier": "ELEVATED",
+        "color": "#EF4444"
       }
     },
     {
@@ -2884,7 +2884,7 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "speed_limit_kmh": 60,
         "lane_count": 4,
         "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.6,
+        "calibrated_risk_probability": 0.685,
         "risk_tier": "ELEVATED",
         "color": "#EF4444"
       }
@@ -2914,7 +2914,7 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "speed_limit_kmh": 60,
         "lane_count": 4,
         "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.606,
+        "calibrated_risk_probability": 0.665,
         "risk_tier": "ELEVATED",
         "color": "#EF4444"
       }
@@ -2943,10 +2943,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "motorway",
         "speed_limit_kmh": 80,
         "lane_count": 6,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.605,
-        "risk_tier": "ELEVATED",
-        "color": "#EF4444"
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.455,
+        "risk_tier": "MODERATE",
+        "color": "#F59E0B"
       }
     },
     {
@@ -2973,8 +2973,8 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "trunk",
         "speed_limit_kmh": 60,
         "lane_count": 4,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.556,
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.405,
         "risk_tier": "MODERATE",
         "color": "#F59E0B"
       }
@@ -3003,8 +3003,8 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "trunk",
         "speed_limit_kmh": 60,
         "lane_count": 4,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.563,
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.435,
         "risk_tier": "MODERATE",
         "color": "#F59E0B"
       }
@@ -3033,10 +3033,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "trunk",
         "speed_limit_kmh": 60,
         "lane_count": 4,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.564,
-        "risk_tier": "MODERATE",
-        "color": "#F59E0B"
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.217,
+        "risk_tier": "LOW",
+        "color": "#10B981"
       }
     },
     {
@@ -3063,10 +3063,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "trunk",
         "speed_limit_kmh": 60,
         "lane_count": 4,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.539,
-        "risk_tier": "MODERATE",
-        "color": "#F59E0B"
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.208,
+        "risk_tier": "LOW",
+        "color": "#10B981"
       }
     },
     {
@@ -3093,10 +3093,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "trunk",
         "speed_limit_kmh": 60,
         "lane_count": 4,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.575,
-        "risk_tier": "MODERATE",
-        "color": "#F59E0B"
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.199,
+        "risk_tier": "LOW",
+        "color": "#10B981"
       }
     },
     {
@@ -3123,10 +3123,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "trunk",
         "speed_limit_kmh": 60,
         "lane_count": 4,
-        "is_blackspot_corridor": false,
-        "calibrated_risk_probability": 0.451,
-        "risk_tier": "MODERATE",
-        "color": "#F59E0B"
+        "is_blackspot_corridor": true,
+        "calibrated_risk_probability": 0.705,
+        "risk_tier": "ELEVATED",
+        "color": "#EF4444"
       }
     },
     {
@@ -3154,9 +3154,9 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "speed_limit_kmh": 60,
         "lane_count": 4,
         "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.571,
-        "risk_tier": "MODERATE",
-        "color": "#F59E0B"
+        "calibrated_risk_probability": 0.685,
+        "risk_tier": "ELEVATED",
+        "color": "#EF4444"
       }
     },
     {
@@ -3184,9 +3184,9 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "speed_limit_kmh": 80,
         "lane_count": 6,
         "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.575,
-        "risk_tier": "MODERATE",
-        "color": "#F59E0B"
+        "calibrated_risk_probability": 0.665,
+        "risk_tier": "ELEVATED",
+        "color": "#EF4444"
       }
     },
     {
@@ -3214,9 +3214,9 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "speed_limit_kmh": 60,
         "lane_count": 4,
         "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.565,
-        "risk_tier": "MODERATE",
-        "color": "#F59E0B"
+        "calibrated_risk_probability": 0.645,
+        "risk_tier": "ELEVATED",
+        "color": "#EF4444"
       }
     },
     {
@@ -3244,7 +3244,7 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "speed_limit_kmh": 60,
         "lane_count": 4,
         "is_blackspot_corridor": false,
-        "calibrated_risk_probability": 0.423,
+        "calibrated_risk_probability": 0.435,
         "risk_tier": "MODERATE",
         "color": "#F59E0B"
       }
@@ -3273,8 +3273,8 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "motorway",
         "speed_limit_kmh": 80,
         "lane_count": 6,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.541,
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.385,
         "risk_tier": "MODERATE",
         "color": "#F59E0B"
       }
@@ -3303,8 +3303,8 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "motorway",
         "speed_limit_kmh": 80,
         "lane_count": 6,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.518,
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.415,
         "risk_tier": "MODERATE",
         "color": "#F59E0B"
       }
@@ -3333,10 +3333,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "trunk",
         "speed_limit_kmh": 60,
         "lane_count": 4,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.616,
-        "risk_tier": "ELEVATED",
-        "color": "#EF4444"
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.19,
+        "risk_tier": "LOW",
+        "color": "#10B981"
       }
     },
     {
@@ -3363,10 +3363,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "motorway",
         "speed_limit_kmh": 80,
         "lane_count": 6,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.579,
-        "risk_tier": "MODERATE",
-        "color": "#F59E0B"
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.244,
+        "risk_tier": "LOW",
+        "color": "#10B981"
       }
     },
     {
@@ -3394,9 +3394,9 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "speed_limit_kmh": 80,
         "lane_count": 6,
         "is_blackspot_corridor": false,
-        "calibrated_risk_probability": 0.386,
-        "risk_tier": "MODERATE",
-        "color": "#F59E0B"
+        "calibrated_risk_probability": 0.235,
+        "risk_tier": "LOW",
+        "color": "#10B981"
       }
     },
     {
@@ -3424,7 +3424,7 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "speed_limit_kmh": 60,
         "lane_count": 4,
         "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.587,
+        "calibrated_risk_probability": 0.685,
         "risk_tier": "ELEVATED",
         "color": "#EF4444"
       }
@@ -3454,9 +3454,9 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "speed_limit_kmh": 60,
         "lane_count": 4,
         "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.551,
-        "risk_tier": "MODERATE",
-        "color": "#F59E0B"
+        "calibrated_risk_probability": 0.665,
+        "risk_tier": "ELEVATED",
+        "color": "#EF4444"
       }
     },
     {
@@ -3484,7 +3484,7 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "speed_limit_kmh": 60,
         "lane_count": 4,
         "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.592,
+        "calibrated_risk_probability": 0.645,
         "risk_tier": "ELEVATED",
         "color": "#EF4444"
       }
@@ -3514,9 +3514,9 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "speed_limit_kmh": 80,
         "lane_count": 6,
         "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.575,
-        "risk_tier": "MODERATE",
-        "color": "#F59E0B"
+        "calibrated_risk_probability": 0.715,
+        "risk_tier": "ELEVATED",
+        "color": "#EF4444"
       }
     },
     {
@@ -3543,10 +3543,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "trunk",
         "speed_limit_kmh": 60,
         "lane_count": 4,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.588,
-        "risk_tier": "ELEVATED",
-        "color": "#EF4444"
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.415,
+        "risk_tier": "MODERATE",
+        "color": "#F59E0B"
       }
     },
     {
@@ -3573,8 +3573,8 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "motorway",
         "speed_limit_kmh": 80,
         "lane_count": 6,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.571,
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.445,
         "risk_tier": "MODERATE",
         "color": "#F59E0B"
       }
@@ -3603,10 +3603,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "trunk",
         "speed_limit_kmh": 60,
         "lane_count": 4,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.598,
-        "risk_tier": "ELEVATED",
-        "color": "#EF4444"
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.395,
+        "risk_tier": "MODERATE",
+        "color": "#F59E0B"
       }
     },
     {
@@ -3633,10 +3633,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "trunk",
         "speed_limit_kmh": 60,
         "lane_count": 4,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.565,
-        "risk_tier": "MODERATE",
-        "color": "#F59E0B"
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.226,
+        "risk_tier": "LOW",
+        "color": "#10B981"
       }
     },
     {
@@ -3663,10 +3663,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "trunk",
         "speed_limit_kmh": 60,
         "lane_count": 4,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.542,
-        "risk_tier": "MODERATE",
-        "color": "#F59E0B"
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.217,
+        "risk_tier": "LOW",
+        "color": "#10B981"
       }
     },
     {
@@ -3693,10 +3693,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "motorway",
         "speed_limit_kmh": 80,
         "lane_count": 6,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.574,
-        "risk_tier": "MODERATE",
-        "color": "#F59E0B"
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.208,
+        "risk_tier": "LOW",
+        "color": "#10B981"
       }
     },
     {
@@ -3724,9 +3724,9 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "speed_limit_kmh": 60,
         "lane_count": 4,
         "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.57,
-        "risk_tier": "MODERATE",
-        "color": "#F59E0B"
+        "calibrated_risk_probability": 0.665,
+        "risk_tier": "ELEVATED",
+        "color": "#EF4444"
       }
     },
     {
@@ -3754,7 +3754,7 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "speed_limit_kmh": 60,
         "lane_count": 4,
         "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.583,
+        "calibrated_risk_probability": 0.645,
         "risk_tier": "ELEVATED",
         "color": "#EF4444"
       }
@@ -3784,7 +3784,7 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "speed_limit_kmh": 60,
         "lane_count": 4,
         "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.601,
+        "calibrated_risk_probability": 0.715,
         "risk_tier": "ELEVATED",
         "color": "#EF4444"
       }
@@ -3814,9 +3814,9 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "speed_limit_kmh": 80,
         "lane_count": 6,
         "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.554,
-        "risk_tier": "MODERATE",
-        "color": "#F59E0B"
+        "calibrated_risk_probability": 0.695,
+        "risk_tier": "ELEVATED",
+        "color": "#EF4444"
       }
     },
     {
@@ -3843,10 +3843,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "motorway",
         "speed_limit_kmh": 80,
         "lane_count": 6,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.602,
-        "risk_tier": "ELEVATED",
-        "color": "#EF4444"
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.395,
+        "risk_tier": "MODERATE",
+        "color": "#F59E0B"
       }
     },
     {
@@ -3873,10 +3873,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "trunk",
         "speed_limit_kmh": 60,
         "lane_count": 4,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.583,
-        "risk_tier": "ELEVATED",
-        "color": "#EF4444"
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.425,
+        "risk_tier": "MODERATE",
+        "color": "#F59E0B"
       }
     },
     {
@@ -3904,7 +3904,7 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "speed_limit_kmh": 60,
         "lane_count": 4,
         "is_blackspot_corridor": false,
-        "calibrated_risk_probability": 0.427,
+        "calibrated_risk_probability": 0.455,
         "risk_tier": "MODERATE",
         "color": "#F59E0B"
       }
@@ -3933,10 +3933,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "trunk",
         "speed_limit_kmh": 60,
         "lane_count": 4,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.574,
-        "risk_tier": "MODERATE",
-        "color": "#F59E0B"
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.199,
+        "risk_tier": "LOW",
+        "color": "#10B981"
       }
     },
     {
@@ -3963,10 +3963,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "trunk",
         "speed_limit_kmh": 60,
         "lane_count": 4,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.549,
-        "risk_tier": "MODERATE",
-        "color": "#F59E0B"
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.19,
+        "risk_tier": "LOW",
+        "color": "#10B981"
       }
     },
     {
@@ -3993,10 +3993,10 @@ export const FALLBACK_MAP_LAYERS: MapLayersResponse = {
         "road_class": "trunk",
         "speed_limit_kmh": 60,
         "lane_count": 4,
-        "is_blackspot_corridor": true,
-        "calibrated_risk_probability": 0.546,
-        "risk_tier": "MODERATE",
-        "color": "#F59E0B"
+        "is_blackspot_corridor": false,
+        "calibrated_risk_probability": 0.244,
+        "risk_tier": "LOW",
+        "color": "#10B981"
       }
     },
     {
