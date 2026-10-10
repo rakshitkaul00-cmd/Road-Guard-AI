@@ -3,9 +3,12 @@ import L from 'leaflet';
 import { 
   Layers, Shield, AlertTriangle, Sun, Moon, CloudRain, Info, Search, 
   CloudLightning, Compass, ChevronDown, ChevronUp, Eye, EyeOff,
-  Radio, Sparkles, Navigation2, CheckCircle2, Wind, MapPin, X, Loader2
+  Radio, Sparkles, Navigation2, CheckCircle2, Wind, MapPin, X, Loader2, Flame
 } from 'lucide-react';
 import { api, MapLayersResponse, MapLayerFeature } from '../services/api';
+import { LeafletHeatmapLayer, HeatPoint } from '../utils/leafletHeatmap';
+
+export type BasemapStyle = 'dark' | 'satellite' | 'standard' | 'heatmap';
 
 interface MapExplorerProps {
   onSelectSegment: (segmentId: number) => void;
@@ -60,10 +63,74 @@ const BENGALURU_GAZETTEER: SearchItem[] = [
   { id: 'hub-airport', name: 'KIA Bengaluru Airport Toll', category: 'Major Junction', coords: [13.2014, 77.7108], desc: 'Kempegowda International Airport' }
 ];
 
+// Helper to extract dense Kernel Density Estimation (KDE) thermal points from all layers
+function extractHeatmapPoints(data: MapLayersResponse): HeatPoint[] {
+  const points: HeatPoint[] = [];
+
+  data.features.forEach((feature: MapLayerFeature) => {
+    const p = feature.properties;
+
+    // 1. Official BTP Blackspots (Highest fatality hotspots)
+    if (p.layer_type === 'official_blackspot') {
+      const [lon, lat] = feature.geometry.coordinates;
+      const fatal = p.total_fatalities_3yr ?? p.fatal_count_3yr ?? 14;
+      const intensity = Math.min(1.0, 0.75 + (fatal / 25) * 0.25);
+      points.push({ lat, lng: lon, intensity });
+
+      // Add micro-cluster nodes around the blackspot to form a natural dense kernel
+      const microOffsets = [
+        [0.0012, 0.0008], [-0.0010, -0.0011], [0.0009, -0.0012], [-0.0011, 0.0009]
+      ];
+      microOffsets.forEach(([dLat, dLng]) => {
+        points.push({
+          lat: lat + dLat,
+          lng: lon + dLng,
+          intensity: intensity * 0.78
+        });
+      });
+    }
+
+    // 2. OSM Highway Links (Risk Segments)
+    if (p.layer_type === 'road_segment') {
+      const baseProb = typeof p.calibrated_risk_probability === 'number'
+        ? p.calibrated_risk_probability
+        : typeof p.calibrated_risk === 'number'
+          ? p.calibrated_risk
+          : (p.risk_tier === 'ELEVATED' || p.is_blackspot_corridor ? 0.70 : p.risk_tier === 'MODERATE' ? 0.45 : 0.22);
+
+      const coords = feature.geometry.coordinates;
+      if (Array.isArray(coords)) {
+        for (let i = 0; i < coords.length; i += 2) {
+          const [cLon, cLat] = coords[i];
+          points.push({
+            lat: cLat,
+            lng: cLon,
+            intensity: Math.min(0.92, Math.max(0.20, baseProb))
+          });
+        }
+      }
+    }
+
+    // 3. Citizen Hazard Reports
+    if (p.layer_type === 'citizen_hazard') {
+      const [lon, lat] = feature.geometry.coordinates;
+      const severity = p.severity_rating || p.severity || 3;
+      points.push({
+        lat,
+        lng: lon,
+        intensity: Math.min(0.85, 0.35 + (severity / 5) * 0.45)
+      });
+    }
+  });
+
+  return points;
+}
+
 export const MapExplorer: React.FC<MapExplorerProps> = ({ onSelectSegment, onOpenReportAtCoord }) => {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
   const tileLayerRef = useRef<L.TileLayer | null>(null);
+  const heatmapLayerRef = useRef<LeafletHeatmapLayer | null>(null);
   const searchBeaconRef = useRef<L.Marker | null>(null);
   const searchContainerRef = useRef<HTMLDivElement>(null);
   
@@ -81,8 +148,9 @@ export const MapExplorer: React.FC<MapExplorerProps> = ({ onSelectSegment, onOpe
   const [layersData, setLayersData] = useState<MapLayersResponse | null>(null);
   const [isPanelOpen, setIsPanelOpen] = useState(true);
 
-  // Basemap View: 'dark' | 'satellite' | 'standard'
-  const [basemapStyle, setBasemapStyle] = useState<'dark' | 'satellite' | 'standard'>('dark');
+  // Basemap View: 'dark' | 'satellite' | 'standard' | 'heatmap'
+  const [basemapStyle, setBasemapStyle] = useState<BasemapStyle>('dark');
+  const [showHeatmap, setShowHeatmap] = useState(false);
 
   // Live Free Weather & Search
   const [liveWeather, setLiveWeather] = useState<any>(null);
@@ -99,7 +167,7 @@ export const MapExplorer: React.FC<MapExplorerProps> = ({ onSelectSegment, onOpe
   const [isRainActive, setIsRainActive] = useState(0);
 
   // Switch Tile Layer dynamically
-  const updateTileLayer = (style: 'dark' | 'satellite' | 'standard', map: L.Map) => {
+  const updateTileLayer = (style: BasemapStyle, map: L.Map) => {
     if (tileLayerRef.current) {
       map.removeLayer(tileLayerRef.current);
     }
@@ -160,6 +228,10 @@ export const MapExplorer: React.FC<MapExplorerProps> = ({ onSelectSegment, onOpe
     mapInstanceRef.current = map;
 
     return () => {
+      if (heatmapLayerRef.current && mapInstanceRef.current) {
+        mapInstanceRef.current.removeLayer(heatmapLayerRef.current);
+        heatmapLayerRef.current = null;
+      }
       map.remove();
       mapInstanceRef.current = null;
     };
@@ -171,6 +243,34 @@ export const MapExplorer: React.FC<MapExplorerProps> = ({ onSelectSegment, onOpe
       updateTileLayer(basemapStyle, mapInstanceRef.current);
     }
   }, [basemapStyle]);
+
+  // Synchronize Thermal KDE Heatmap Layer with map
+  useEffect(() => {
+    if (!mapInstanceRef.current || !layersData) return;
+    const map = mapInstanceRef.current;
+    const shouldShow = basemapStyle === 'heatmap' || showHeatmap;
+
+    if (shouldShow) {
+      const points = extractHeatmapPoints(layersData);
+      if (!heatmapLayerRef.current) {
+        heatmapLayerRef.current = new LeafletHeatmapLayer(points, {
+          radius: 32,
+          blur: 22,
+          minOpacity: 0.08
+        });
+        heatmapLayerRef.current.addTo(map);
+      } else {
+        heatmapLayerRef.current.setPoints(points);
+        if (!map.hasLayer(heatmapLayerRef.current)) {
+          heatmapLayerRef.current.addTo(map);
+        }
+      }
+    } else {
+      if (heatmapLayerRef.current && map.hasLayer(heatmapLayerRef.current)) {
+        map.removeLayer(heatmapLayerRef.current);
+      }
+    }
+  }, [basemapStyle, showHeatmap, layersData]);
 
   // Load Layers & Live Weather
   const fetchMapData = async () => {
@@ -449,10 +549,11 @@ export const MapExplorer: React.FC<MapExplorerProps> = ({ onSelectSegment, onOpe
 
         const latLngs = feature.geometry.coordinates.map((coord: [number, number]) => [coord[1], coord[0]]);
 
+        const isHeatmapActive = basemapStyle === 'heatmap' || showHeatmap;
         const polyline = L.polyline(latLngs, {
           color: color,
-          weight: weight,
-          opacity: 0.94,
+          weight: isHeatmapActive ? 2.5 : weight,
+          opacity: isHeatmapActive ? 0.38 : 0.94,
           lineCap: 'round',
           lineJoin: 'round'
         });
@@ -523,7 +624,7 @@ export const MapExplorer: React.FC<MapExplorerProps> = ({ onSelectSegment, onOpe
         hazards.addLayer(marker);
       }
     });
-  }, [layersData, showBlackspots, showSegments, showHazards, isNightTime, isRainActive]);
+  }, [layersData, showBlackspots, showSegments, showHazards, isNightTime, isRainActive, basemapStyle, showHeatmap]);
 
   return (
     <div className="relative w-full h-[calc(100vh-68px)] overflow-hidden font-sans">
@@ -553,7 +654,7 @@ export const MapExplorer: React.FC<MapExplorerProps> = ({ onSelectSegment, onOpe
       {/* Top Floating Telemetry & Weather Status Bar */}
       <div className="absolute top-4 left-4 right-4 md:right-auto z-10 flex flex-wrap items-center gap-2.5">
         {/* Basemap Style Switcher */}
-        <div className="glass-card px-1.5 py-1 rounded-2xl flex items-center space-x-1 shadow-2xl text-xs">
+        <div className="glass-card px-1.5 py-1 rounded-2xl flex flex-wrap items-center space-x-1 shadow-2xl text-xs">
           <button
             onClick={() => setBasemapStyle('dark')}
             className={`px-3 py-1.5 rounded-xl font-medium transition-all ${
@@ -583,6 +684,17 @@ export const MapExplorer: React.FC<MapExplorerProps> = ({ onSelectSegment, onOpe
             }`}
           >
             🗺️ Blueprint
+          </button>
+          <button
+            onClick={() => setBasemapStyle('heatmap')}
+            className={`px-3 py-1.5 rounded-xl font-medium transition-all flex items-center gap-1 ${
+              basemapStyle === 'heatmap' 
+                ? 'bg-gradient-to-r from-amber-500 via-orange-600 to-rose-600 text-white font-semibold shadow-lg shadow-orange-500/30 ring-1 ring-white/20' 
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <span>🔥</span>
+            <span>Heatmap</span>
           </button>
         </div>
 
@@ -736,6 +848,27 @@ export const MapExplorer: React.FC<MapExplorerProps> = ({ onSelectSegment, onOpe
             <div className="space-y-1.5 pt-2 border-t border-white/[0.08]">
               <label className="flex items-center justify-between cursor-pointer hover:bg-white/[0.04] px-2.5 py-1.5 rounded-xl transition-all">
                 <div className="flex items-center space-x-2.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 shadow-[0_0_10px_rgba(255,94,0,0.8)]"></span>
+                  <span className="text-slate-200 font-medium">Thermal Accident Heatmap (KDE)</span>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={basemapStyle === 'heatmap' || showHeatmap}
+                  onChange={(e) => {
+                    const isChecked = e.target.checked;
+                    setShowHeatmap(isChecked);
+                    if (isChecked && basemapStyle !== 'heatmap') {
+                      setBasemapStyle('heatmap');
+                    } else if (!isChecked && basemapStyle === 'heatmap') {
+                      setBasemapStyle('dark');
+                    }
+                  }}
+                  className="rounded bg-[#08090D] border-white/20 text-cyan-500 focus:ring-0 cursor-pointer"
+                />
+              </label>
+
+              <label className="flex items-center justify-between cursor-pointer hover:bg-white/[0.04] px-2.5 py-1.5 rounded-xl transition-all">
+                <div className="flex items-center space-x-2.5">
                   <span className="w-2.5 h-2.5 rounded-full bg-[#FF2E5B] shadow-[0_0_10px_rgba(255,46,91,0.6)]"></span>
                   <span className="text-slate-200 font-medium">BTP Fatal Corridors (16)</span>
                 </div>
@@ -821,24 +954,46 @@ export const MapExplorer: React.FC<MapExplorerProps> = ({ onSelectSegment, onOpe
 
       {/* Floating Tactical Legend (Bottom Left Dock) */}
       <div className="absolute bottom-4 left-4 z-10 glass-card px-4 py-3 rounded-2xl shadow-2xl text-[11px] space-y-1.5 hidden md:block">
-        <div className="flex items-center justify-between text-slate-200 font-display font-bold border-b border-white/10 pb-1.5 gap-4">
-          <span>Risk Surface Hierarchy</span>
-          <span className="text-[10px] font-mono text-cyan-400">Platt Calibrated</span>
-        </div>
-        <div className="flex items-center space-x-4 pt-0.5">
-          <div className="flex items-center space-x-2 text-slate-300">
-            <span className="w-3.5 h-2 rounded bg-[#00F59B] shadow-[0_0_8px_rgba(0,245,155,0.6)]"></span>
-            <span>&lt; 28% Low</span>
-          </div>
-          <div className="flex items-center space-x-2 text-slate-300">
-            <span className="w-3.5 h-2 rounded bg-[#FFB800] shadow-[0_0_8px_rgba(255,184,0,0.6)]"></span>
-            <span>28–58% Moderate</span>
-          </div>
-          <div className="flex items-center space-x-2 text-slate-300">
-            <span className="w-3.5 h-2 rounded bg-[#FF2E5B] shadow-[0_0_8px_rgba(255,46,91,0.6)]"></span>
-            <span>&gt; 58% Critical</span>
-          </div>
-        </div>
+        {basemapStyle === 'heatmap' || showHeatmap ? (
+          <>
+            <div className="flex items-center justify-between text-slate-200 font-display font-bold border-b border-white/10 pb-1.5 gap-4">
+              <span className="flex items-center gap-1.5">
+                <span>🔥</span>
+                <span>Accident Density Heatmap</span>
+              </span>
+              <span className="text-[10px] font-mono text-rose-400">KDE Density Surface</span>
+            </div>
+            <div className="space-y-1 pt-1">
+              <div className="w-56 h-2.5 rounded-full bg-gradient-to-r from-[#00F59B] via-[#00E5FF] via-[#FFB800] via-[#FF5E00] to-[#FF2E5B] shadow-sm"></div>
+              <div className="flex justify-between text-[10px] font-mono text-slate-400 pt-0.5">
+                <span className="text-emerald-400">Low Exposure</span>
+                <span className="text-amber-400">Moderate</span>
+                <span className="text-rose-400 font-bold">Critical Hotspot</span>
+              </div>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="flex items-center justify-between text-slate-200 font-display font-bold border-b border-white/10 pb-1.5 gap-4">
+              <span>Risk Surface Hierarchy</span>
+              <span className="text-[10px] font-mono text-cyan-400">Platt Calibrated</span>
+            </div>
+            <div className="flex items-center space-x-4 pt-0.5">
+              <div className="flex items-center space-x-2 text-slate-300">
+                <span className="w-3.5 h-2 rounded bg-[#00F59B] shadow-[0_0_8px_rgba(0,245,155,0.6)]"></span>
+                <span>&lt; 28% Low</span>
+              </div>
+              <div className="flex items-center space-x-2 text-slate-300">
+                <span className="w-3.5 h-2 rounded bg-[#FFB800] shadow-[0_0_8px_rgba(255,184,0,0.6)]"></span>
+                <span>28–58% Moderate</span>
+              </div>
+              <div className="flex items-center space-x-2 text-slate-300">
+                <span className="w-3.5 h-2 rounded bg-[#FF2E5B] shadow-[0_0_8px_rgba(255,46,91,0.6)]"></span>
+                <span>&gt; 58% Critical</span>
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

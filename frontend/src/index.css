@@ -119,6 +119,11 @@
   filter: brightness(95%) contrast(100%);
 }
 
+.map-theme-heatmap .leaflet-tile-pane {
+  filter: invert(100%) hue-rotate(190deg) brightness(72%) contrast(125%) saturate(70%);
+}
+
+
 /* Leaflet Custom Popups & Tooltips */
 .leaflet-popup-content-wrapper {
   background: rgba(13, 15, 21, 0.94) !important;
