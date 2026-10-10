@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, PhoneCall, AlertOctagon, ExternalLink, ShieldAlert } from 'lucide-react';
+import { X, PhoneCall, AlertOctagon, ExternalLink, ShieldAlert, ArrowUpRight } from 'lucide-react';
 
 interface EmergencyDrawerProps {
   isOpen: boolean;
@@ -11,35 +11,35 @@ export const EmergencyDrawer: React.FC<EmergencyDrawerProps> = ({ isOpen, onClos
 
   const emergencyContacts = [
     {
-      name: 'Unified Emergency Services (India)',
+      name: 'Unified National Emergency Services',
       number: '112',
-      description: 'Single emergency helpline for Police, Fire, and Ambulance response across Karnataka.',
+      description: 'Single national emergency response helpline for Police, Fire, and Ambulance across Karnataka.',
       action: 'tel:112',
-      badge: 'Immediate Response'
+      badge: 'Immediate Dispatch'
     },
     {
       name: 'Bengaluru Traffic Police (BTP) Helpline',
       number: '103',
-      description: 'Dedicated traffic assistance, reporting severe road obstructions, and signal failures.',
+      description: 'Dedicated traffic assistance, reporting major road blockages, and signal failure emergencies.',
       action: 'tel:103',
-      badge: 'BTP Traffic Helpline'
+      badge: 'BTP Traffic Desk'
     },
     {
-      name: 'Arogya Kavacha Medical Ambulance',
+      name: 'Arogya Kavacha Trauma Ambulance',
       number: '108',
-      description: 'Karnataka state 24x7 emergency medical trauma and critical patient ambulance response.',
+      description: 'Karnataka state 24x7 emergency medical trauma ambulance for crash victims and critical triage.',
       action: 'tel:108',
       badge: 'Medical Trauma'
     },
     {
-      name: 'BBMP Disaster & Infrastructure Control Room',
+      name: 'BBMP Disaster & Infrastructure Control',
       number: '1533',
-      description: 'Municipal control room for severe flooding, road cave-ins, and fallen tree clearance.',
+      description: 'Municipal control room for flash flooding, road cave-ins, and fallen tree clearance.',
       action: 'tel:1533',
       badge: 'Municipal Disaster'
     },
     {
-      name: 'Bengaluru City Police Central Control Room',
+      name: 'City Police Central Command Room',
       number: '080-22942222',
       description: 'Direct administrative control line for citywide law enforcement and road safety emergencies.',
       action: 'tel:08022942222',
@@ -48,52 +48,56 @@ export const EmergencyDrawer: React.FC<EmergencyDrawerProps> = ({ isOpen, onClos
   ];
 
   return (
-    <div className="fixed inset-y-0 right-0 z-50 w-full max-w-md bg-[#0F172A] border-l border-slate-800 shadow-2xl flex flex-col">
+    <div className="fixed inset-y-0 right-0 z-50 w-full max-w-md bg-[#0D0F15]/96 backdrop-blur-2xl border-l border-white/10 shadow-2xl flex flex-col animate-drawer-in font-sans">
       {/* Header */}
-      <div className="p-4 border-b border-slate-800 flex items-center justify-between bg-red-950/20">
-        <div className="flex items-center space-x-2 text-red-400">
-          <PhoneCall className="w-5 h-5" />
-          <h3 className="font-bold text-sm text-white">Emergency Assistance Directory</h3>
+      <div className="p-5 border-b border-white/[0.08] flex items-center justify-between bg-rose-950/20">
+        <div className="flex items-center space-x-3 text-rose-400">
+          <div className="w-10 h-10 rounded-2xl bg-rose-500/15 border border-rose-500/30 flex items-center justify-center">
+            <PhoneCall className="w-5 h-5 text-rose-400" />
+          </div>
+          <div>
+            <h3 className="font-display font-black text-sm text-white">Karnataka Emergency Hotlines</h3>
+            <p className="text-[10px] text-slate-400 font-mono">Official State Telephony Directory</p>
+          </div>
         </div>
         <button
           onClick={onClose}
-          className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-all"
+          className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition-all"
         >
           <X className="w-5 h-5" />
         </button>
       </div>
 
-      {/* Critical Disclaimer Banner */}
-      <div className="p-4 bg-red-950/40 border-b border-red-900/50 flex items-start space-x-3 text-xs text-red-200">
-        <AlertOctagon className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
-        <div className="space-y-1">
-          <span className="font-bold text-red-300 block">Academic Research Prototype Notice</span>
-          <p className="leading-relaxed text-red-200/90 text-[11px]">
-            RoadGuard AI is a university decision-support research platform. It does <strong>NOT</strong> have active automated dispatch integrations with emergency services. If you are experiencing or witnessing an active road crash, dial <strong>112</strong> immediately.
-          </p>
+      {/* Contacts List */}
+      <div className="flex-1 overflow-y-auto p-5 space-y-3.5 text-xs">
+        <div className="bg-rose-500/10 border border-rose-500/20 rounded-2xl p-3 text-[11px] text-rose-300 flex items-start space-x-2">
+          <ShieldAlert className="w-4 h-4 text-rose-400 flex-shrink-0 mt-0.5" />
+          <span>If you are witnessing an active accident with casualties, dial <strong>112</strong> immediately. RoadGuard AI is an analytical research platform and does not dispatch emergency first responders.</span>
         </div>
-      </div>
 
-      {/* Directory List */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3 text-xs">
-        {emergencyContacts.map((c, idx) => (
-          <div key={idx} className="bg-slate-900 border border-slate-800 rounded-xl p-3.5 space-y-2 hover:border-slate-700 transition-all">
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
-                {c.badge}
-              </span>
-              <a
-                href={c.action}
-                className="flex items-center space-x-1 text-blue-400 font-bold hover:underline"
-              >
-                <span>Call {c.number}</span>
-                <ExternalLink className="w-3 h-3" />
-              </a>
+        <div className="space-y-3 pt-1">
+          {emergencyContacts.map((contact, idx) => (
+            <div
+              key={idx}
+              className="glass-card rounded-2xl p-4 space-y-2 hover:border-white/20 transition-all"
+            >
+              <div className="flex items-center justify-between">
+                <span className="font-mono text-[9px] font-bold px-2 py-0.5 rounded-full bg-white/[0.06] text-slate-300 border border-white/10 uppercase">
+                  {contact.badge}
+                </span>
+                <a
+                  href={contact.action}
+                  className="font-display font-black text-rose-400 hover:text-rose-300 text-sm flex items-center gap-1 font-mono tracking-wider"
+                >
+                  <span>{contact.number}</span>
+                  <ArrowUpRight className="w-3.5 h-3.5" />
+                </a>
+              </div>
+              <h4 className="font-display font-bold text-white text-xs">{contact.name}</h4>
+              <p className="text-slate-400 text-[11px] font-light leading-relaxed">{contact.description}</p>
             </div>
-            <h4 className="font-bold text-slate-100 text-sm">{c.name}</h4>
-            <p className="text-slate-400 text-[11px] leading-relaxed">{c.description}</p>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   );

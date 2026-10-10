@@ -2,8 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import { 
   Layers, Shield, AlertTriangle, Sun, Moon, CloudRain, Info, Search, 
-  CloudLightning, Compass, Crosshair, ChevronDown, ChevronUp, Eye, EyeOff,
-  Radio, Sparkles, Navigation2
+  CloudLightning, Compass, ChevronDown, ChevronUp, Eye, EyeOff,
+  Radio, Sparkles, Navigation2, CheckCircle2, Wind
 } from 'lucide-react';
 import { api, MapLayersResponse, MapLayerFeature } from '../services/api';
 
@@ -29,53 +29,49 @@ export const MapExplorer: React.FC<MapExplorerProps> = ({ onSelectSegment, onOpe
 
   const [loading, setLoading] = useState(true);
   const [layersData, setLayersData] = useState<MapLayersResponse | null>(null);
-  const [selectedCorridorFilter, setSelectedCorridorFilter] = useState('ALL');
-  const [isControlsExpanded, setIsControlsExpanded] = useState(true);
+  const [isPanelOpen, setIsPanelOpen] = useState(true);
 
-  // Basemap View Style: 'dark' | 'satellite' | 'standard'
+  // Basemap View: 'dark' | 'satellite' | 'standard'
   const [basemapStyle, setBasemapStyle] = useState<'dark' | 'satellite' | 'standard'>('dark');
 
-  // Live Free APIs State
+  // Live Free Weather & Search
   const [liveWeather, setLiveWeather] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Filter & Operating Context States
+  // Toggles & Simulation Context
   const [showBlackspots, setShowBlackspots] = useState(true);
   const [showSegments, setShowSegments] = useState(true);
   const [showHazards, setShowHazards] = useState(true);
-  const [minSeverity, setMinSeverity] = useState(1);
   const [isNightTime, setIsNightTime] = useState(1);
   const [isRainActive, setIsRainActive] = useState(0);
 
-  // Landmark Coordinates for Quick Jump (Nominatim Verified)
-  const BENGALURU_LANDMARKS: Record<string, { coords: [number, number]; desc: string }> = {
-    'Silk Board': { coords: [12.9176, 77.6238], desc: 'South Hub • High Congestion' },
-    'Hebbal Flyover': { coords: [13.0358, 77.5970], desc: 'North Spine • Airport Corridor' },
-    'Marathahalli': { coords: [12.9562, 77.7011], desc: 'East IT Corridor • ORR' },
-    'Tin Factory': { coords: [12.9972, 77.6698], desc: 'KR Puram • Multi-Modal Node' },
-    'Peenya 8th Mile': { coords: [13.0458, 77.5029], desc: 'Tumakuru Highway • Heavy Freight' },
-    'Electronic City': { coords: [12.8452, 77.6602], desc: 'Elevated Expressway • IT Hub' },
-    'Indiranagar': { coords: [12.9784, 77.6408], desc: '100ft Road • High Pedestrian' },
-    'Kengeri Bus Stand': { coords: [12.9125, 77.4839], desc: 'Mysuru Road • Urban Border' }
+  // Bengaluru Major Transport Hubs
+  const BENGALURU_HUBS: Record<string, { coords: [number, number]; desc: string }> = {
+    'Silk Board': { coords: [12.9176, 77.6238], desc: 'Outer Ring Rd • High Crash Density' },
+    'Hebbal Flyover': { coords: [13.0358, 77.5970], desc: 'NH-44 Airport Corridor' },
+    'Marathahalli': { coords: [12.9562, 77.7011], desc: 'ORR East Tech Zone' },
+    'Tin Factory': { coords: [12.9972, 77.6698], desc: 'Old Madras Rd • KR Puram' },
+    'Peenya 8th Mile': { coords: [13.0458, 77.5029], desc: 'Tumakuru Highway Corridor' },
+    'Electronic City': { coords: [12.8452, 77.6602], desc: 'Hosur Rd Elevated Flyover' },
+    'Indiranagar': { coords: [12.9784, 77.6408], desc: '100ft Rd Commercial Zone' },
+    'Kengeri Bus Stand': { coords: [12.9125, 77.4839], desc: 'Mysuru Rd High-Speed Link' }
   };
 
-  // Switch Tile Layer based on basemap style
+  // Switch Tile Layer dynamically
   const updateTileLayer = (style: 'dark' | 'satellite' | 'standard', map: L.Map) => {
     if (tileLayerRef.current) {
       map.removeLayer(tileLayerRef.current);
     }
 
     if (style === 'satellite') {
-      // Free high-resolution ESRI World Imagery (No API Key Required)
       tileLayerRef.current = L.tileLayer(
         'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
         {
-          attribution: '&copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+          attribution: '&copy; Esri &mdash; High-Resolution Aerial Satellite',
           maxZoom: 18
         }
       ).addTo(map);
     } else {
-      // OpenStreetMap with CSS filter for dark/standard
       tileLayerRef.current = L.tileLayer(
         'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
         {
@@ -86,11 +82,10 @@ export const MapExplorer: React.FC<MapExplorerProps> = ({ onSelectSegment, onOpe
     }
   };
 
-  // Initialize Leaflet Map
+  // Initialize Map
   useEffect(() => {
     if (!mapContainerRef.current || mapInstanceRef.current) return;
 
-    // Center on Bengaluru Central (BBMP)
     const map = L.map(mapContainerRef.current, {
       center: [12.9716, 77.5946],
       zoom: 12,
@@ -98,7 +93,6 @@ export const MapExplorer: React.FC<MapExplorerProps> = ({ onSelectSegment, onOpe
     });
 
     L.control.zoom({ position: 'bottomright' }).addTo(map);
-
     updateTileLayer(basemapStyle, map);
 
     layerGroupsRef.current.blackspots.addTo(map);
@@ -126,11 +120,11 @@ export const MapExplorer: React.FC<MapExplorerProps> = ({ onSelectSegment, onOpe
     }
   }, [basemapStyle]);
 
-  // Fetch map layers
+  // Load Layers & Live Weather
   const fetchMapData = async () => {
     setLoading(true);
     try {
-      const data = await api.getMapLayers('all', minSeverity);
+      const data = await api.getMapLayers('all', 1);
       setLayersData(data);
     } catch (e) {
       console.error("Failed to load map layers", e);
@@ -139,7 +133,6 @@ export const MapExplorer: React.FC<MapExplorerProps> = ({ onSelectSegment, onOpe
     }
   };
 
-  // Fetch Live Weather from Open-Meteo
   const fetchLiveWeather = async () => {
     try {
       const w = await api.getLiveWeather();
@@ -148,35 +141,34 @@ export const MapExplorer: React.FC<MapExplorerProps> = ({ onSelectSegment, onOpe
         setIsRainActive(1);
       }
     } catch (e) {
-      console.error("Live weather query error", e);
+      console.error("Live weather error", e);
     }
   };
 
   useEffect(() => {
     fetchMapData();
     fetchLiveWeather();
-  }, [minSeverity]);
+  }, []);
 
-  // Handle Search / Jump
-  const handleJumpToLandmark = (coords: [number, number]) => {
+  const handleJumpToHub = (coords: [number, number]) => {
     if (mapInstanceRef.current) {
-      mapInstanceRef.current.flyTo(coords, 14, { duration: 1.5 });
+      mapInstanceRef.current.flyTo(coords, 14, { duration: 1.4 });
     }
   };
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const query = searchQuery.trim().toLowerCase();
-    for (const [name, info] of Object.entries(BENGALURU_LANDMARKS)) {
+    for (const [name, info] of Object.entries(BENGALURU_HUBS)) {
       if (name.toLowerCase().includes(query)) {
-        handleJumpToLandmark(info.coords);
+        handleJumpToHub(info.coords);
         return;
       }
     }
-    handleJumpToLandmark([12.9716, 77.5946]);
+    handleJumpToHub([12.9716, 77.5946]);
   };
 
-  // Render Features to Leaflet Layers
+  // Render Features to Leaflet
   useEffect(() => {
     if (!mapInstanceRef.current || !layersData) return;
 
@@ -190,68 +182,65 @@ export const MapExplorer: React.FC<MapExplorerProps> = ({ onSelectSegment, onOpe
 
       // 1. Official BTP Blackspots
       if (p.layer_type === 'official_blackspot' && showBlackspots) {
-        if (selectedCorridorFilter !== 'ALL' && !p.corridor_name.includes(selectedCorridorFilter)) {
-          return;
-        }
-
         const [lon, lat] = feature.geometry.coordinates;
 
+        // 500m evaluation perimeter
         const bufferCircle = L.circle([lat, lon], {
           radius: p.buffer_radius_m || 500,
-          color: '#EF4444',
-          weight: 1.8,
-          opacity: 0.8,
-          fillColor: '#EF4444',
-          fillOpacity: 0.15,
-          dashArray: '5, 8'
+          color: '#FF2E5B',
+          weight: 1.5,
+          opacity: 0.7,
+          fillColor: '#FF2E5B',
+          fillOpacity: 0.12,
+          dashArray: '6, 8'
         });
 
-        // Pulsing custom div icon marker
-        const pulsingIcon = L.divIcon({
-          className: 'custom-blackspot-marker',
+        // Custom Double-Radar Center Marker
+        const customIcon = L.divIcon({
+          className: 'tactical-blackspot-icon',
           html: `
             <div class="relative flex items-center justify-center">
-              <span class="absolute w-7 h-7 rounded-full bg-red-500/40 animate-ping"></span>
-              <span class="relative w-4 h-4 rounded-full bg-red-600 border-2 border-white shadow-lg flex items-center justify-center">
+              <span class="absolute w-8 h-8 rounded-full bg-rose-500/30 radar-ping"></span>
+              <span class="relative w-4 h-4 rounded-full bg-[#FF2E5B] border-2 border-white shadow-lg flex items-center justify-center">
                 <span class="w-1.5 h-1.5 rounded-full bg-white"></span>
               </span>
             </div>
           `,
-          iconSize: [28, 28],
-          iconAnchor: [14, 14]
+          iconSize: [32, 32],
+          iconAnchor: [16, 16]
         });
 
-        const centerMarker = L.marker([lat, lon], { icon: pulsingIcon });
+        const centerMarker = L.marker([lat, lon], { icon: customIcon });
 
         const popupContent = `
-          <div class="p-2 space-y-2.5 max-w-xs text-slate-100">
-            <div class="flex items-center justify-between border-b border-slate-700/80 pb-1.5">
-              <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-red-500/20 text-red-400 border border-red-500/30 flex items-center gap-1">
-                <span class="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse"></span>
+          <div class="p-2 space-y-2.5 max-w-xs font-sans text-slate-100">
+            <div class="flex items-center justify-between border-b border-white/10 pb-2">
+              <span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30 flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse"></span>
                 OFFICIAL BTP BLACKSPOT
               </span>
-              <span class="text-[10px] font-mono text-slate-400">ID: #${p.blackspot_id}</span>
+              <span class="text-[10px] font-mono text-slate-400">#${p.blackspot_id}</span>
             </div>
             <div>
-              <h4 class="font-bold text-sm text-white">${p.junction_name}</h4>
-              <p class="text-[11px] text-slate-300">${p.corridor_name}</p>
+              <h4 class="font-display font-bold text-sm text-white">${p.junction_name}</h4>
+              <p class="text-[11px] text-slate-300 font-medium">${p.corridor_name}</p>
             </div>
-            <div class="grid grid-cols-2 gap-2 bg-slate-900/90 p-2 rounded-xl border border-slate-700 text-xs">
-              <div class="text-center p-1 bg-red-950/40 rounded border border-red-900/40">
-                <span class="text-slate-400 block text-[9px] uppercase tracking-wider font-semibold">3-Yr Fatalities</span>
-                <span class="font-black text-red-400 text-base">${p.fatal_count_3yr}</span>
+            <div class="grid grid-cols-2 gap-2 bg-[#0A0D14] p-2 rounded-xl border border-white/10 text-xs">
+              <div class="text-center p-1.5 bg-rose-950/40 rounded-lg border border-rose-900/30">
+                <span class="text-slate-400 block text-[9px] uppercase tracking-wider font-semibold">Fatalities (3-Yr)</span>
+                <span class="font-display font-black text-rose-400 text-base">${p.fatal_count_3yr}</span>
               </div>
-              <div class="text-center p-1 bg-amber-950/40 rounded border border-amber-900/40">
-                <span class="text-slate-400 block text-[9px] uppercase tracking-wider font-semibold">3-Yr Severe Injuries</span>
-                <span class="font-black text-amber-400 text-base">${p.injury_count_3yr}</span>
+              <div class="text-center p-1.5 bg-amber-950/40 rounded-lg border border-amber-900/30">
+                <span class="text-slate-400 block text-[9px] uppercase tracking-wider font-semibold">Injuries (3-Yr)</span>
+                <span class="font-display font-black text-amber-400 text-base">${p.injury_count_3yr}</span>
               </div>
             </div>
             <p class="text-[11px] text-slate-300 leading-snug">
-              <strong class="text-slate-200">Engineering Hazard Factor:</strong> ${p.primary_hazard_cause}
+              <strong class="text-slate-200">Engineering Cause:</strong> ${p.primary_hazard_cause}
             </p>
-            <div class="text-[9px] text-slate-400 border-t border-slate-700/80 pt-1.5 flex items-center justify-between">
-              <span>Verified: ${p.official_source}</span>
-              <span class="font-mono text-blue-400">r = 500m</span>
+            <div class="text-[9px] text-slate-400 border-t border-white/10 pt-1.5 flex items-center justify-between font-mono">
+              <span>MoRTH Citation • Buffer: 500m</span>
+              <span class="text-cyan-400 font-bold">Verified</span>
             </div>
           </div>
         `;
@@ -266,7 +255,7 @@ export const MapExplorer: React.FC<MapExplorerProps> = ({ onSelectSegment, onOpe
       if (p.layer_type === 'road_segment' && showSegments) {
         const coords = feature.geometry.coordinates.map((c: [number, number]) => [c[1], c[0]]);
         
-        let color = p.color;
+        let color = '#00F59B'; // Mint Aurora
         let riskProb = p.calibrated_risk_probability;
         if (isNightTime && !p.is_blackspot_corridor) {
           riskProb = Math.min(0.95, riskProb + 0.12);
@@ -275,14 +264,13 @@ export const MapExplorer: React.FC<MapExplorerProps> = ({ onSelectSegment, onOpe
           riskProb = Math.min(0.95, riskProb + 0.14);
         }
 
-        if (riskProb >= 0.58) color = '#EF4444';
-        else if (riskProb >= 0.28) color = '#F59E0B';
-        else color = '#10B981';
+        if (riskProb >= 0.58) color = '#FF2E5B'; // Crimson Neon
+        else if (riskProb >= 0.28) color = '#FFB800'; // Solar Amber
 
         const polyline = L.polyline(coords, {
           color: color,
           weight: p.is_blackspot_corridor ? 6 : 4,
-          opacity: 0.9,
+          opacity: 0.92,
           lineCap: 'round',
           lineJoin: 'round'
         });
@@ -292,16 +280,17 @@ export const MapExplorer: React.FC<MapExplorerProps> = ({ onSelectSegment, onOpe
         });
 
         polyline.bindTooltip(`
-          <div class="text-xs p-1 space-y-1">
-            <div class="font-bold text-white">${p.road_name}</div>
+          <div class="text-xs p-1 space-y-1 font-sans">
+            <div class="font-display font-bold text-white text-sm">${p.road_name}</div>
             <div class="flex items-center justify-between gap-3 text-[11px]">
-              <span class="text-slate-400 capitalize">${p.road_class} • ${p.speed_limit_kmh} km/h</span>
-              <span class="font-bold px-1.5 py-0.5 rounded" style="background:${color}20; color:${color}">
-                ${Math.round(riskProb * 100)}% Risk
+              <span class="text-slate-300 capitalize">${p.road_class} • ${p.speed_limit_kmh} km/h</span>
+              <span class="font-mono font-bold px-1.5 py-0.5 rounded text-[10px]" style="background:${color}25; color:${color}">
+                ${Math.round(riskProb * 100)}% RELATIVE RISK
               </span>
             </div>
-            <div class="text-[10px] text-blue-400 font-medium flex items-center gap-1 pt-0.5 border-t border-slate-700">
-              <span>👉 Click for SHAP Attribution Breakdown</span>
+            <div class="text-[10px] text-cyan-400 font-medium pt-1 border-t border-white/10 flex items-center justify-between">
+              <span>Click to inspect local SHAP card</span>
+              <span class="font-mono">#${p.segment_id}</span>
             </div>
           </div>
         `, { sticky: true, opacity: 0.95 });
@@ -314,97 +303,102 @@ export const MapExplorer: React.FC<MapExplorerProps> = ({ onSelectSegment, onOpe
         const [lon, lat] = feature.geometry.coordinates;
 
         const hazardIcon = L.divIcon({
-          className: 'custom-hazard-marker',
+          className: 'tactical-hazard-icon',
           html: `
-            <div class="relative flex items-center justify-center cursor-pointer">
-              <span class="w-3.5 h-3.5 rounded-full ${p.status === 'VERIFIED' ? 'bg-emerald-500' : 'bg-amber-500'} border-2 border-white shadow-md flex items-center justify-center text-[8px] font-bold text-slate-900">
+            <div class="relative flex items-center justify-center cursor-pointer hover:scale-125 transition-transform">
+              <span class="w-4 h-4 rounded-full ${p.status === 'VERIFIED' ? 'bg-[#00F59B]' : 'bg-[#FFB800]'} border-2 border-white shadow-lg flex items-center justify-center text-[9px] font-black text-slate-950">
                 ${p.corroboration_count > 1 ? p.corroboration_count : '!'}
               </span>
             </div>
           `,
-          iconSize: [16, 16],
-          iconAnchor: [8, 8]
+          iconSize: [18, 18],
+          iconAnchor: [9, 9]
         });
 
         const hazardMarker = L.marker([lat, lon], { icon: hazardIcon });
 
         const statusBadge = p.status === 'VERIFIED'
-          ? '<span class="px-2 py-0.5 rounded text-[9px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-bold">MUNICIPALLY VERIFIED</span>'
-          : '<span class="px-2 py-0.5 rounded text-[9px] bg-amber-500/20 text-amber-400 border border-amber-500/30 font-bold">COMMUNITY REPORT</span>';
+          ? '<span class="px-2 py-0.5 rounded text-[9px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold">MUNICIPALLY VERIFIED</span>'
+          : '<span class="px-2 py-0.5 rounded text-[9px] bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold">COMMUNITY CORROBORATED</span>';
 
         hazardMarker.bindPopup(`
-          <div class="p-2 space-y-2 max-w-xs text-xs text-slate-100">
-            <div class="flex items-center justify-between border-b border-slate-700 pb-1.5">
-              <span class="font-bold text-white text-sm">${p.hazard_type}</span>
+          <div class="p-2 space-y-2 max-w-xs text-xs font-sans text-slate-100">
+            <div class="flex items-center justify-between border-b border-white/10 pb-1.5">
+              <span class="font-display font-bold text-white text-sm">${p.hazard_type}</span>
               ${statusBadge}
             </div>
             <p class="text-slate-300 text-xs leading-relaxed">${p.description}</p>
-            <div class="grid grid-cols-2 gap-2 bg-slate-900/80 p-2 rounded-lg border border-slate-700 text-[11px]">
+            <div class="grid grid-cols-2 gap-2 bg-[#0A0D14] p-2 rounded-xl border border-white/10 text-[11px]">
               <div>
                 <span class="text-slate-400 block text-[9px]">Severity Score</span>
-                <span class="font-bold text-amber-400">${p.severity_rating} / 5</span>
+                <span class="font-mono font-bold text-amber-400">${p.severity_rating} / 5</span>
               </div>
               <div>
-                <span class="text-slate-400 block text-[9px]">Spatially Corroborated</span>
-                <span class="font-bold text-blue-400">${p.corroboration_count} reports</span>
+                <span class="text-slate-400 block text-[9px]">Spatial Reports</span>
+                <span class="font-mono font-bold text-cyan-400">${p.corroboration_count} corroborated</span>
               </div>
             </div>
-            ${p.is_synthetic ? '<div class="text-[9px] text-slate-500 italic">Pre-seeded synthetic demonstration observation (≤50m deduplicated)</div>' : ''}
+            ${p.is_synthetic ? '<div class="text-[9px] text-slate-500 italic">Synthetic prototype observation (≤50m deduplicated)</div>' : ''}
           </div>
         `);
 
         hazards.addLayer(hazardMarker);
       }
     });
-  }, [layersData, showBlackspots, showSegments, showHazards, selectedCorridorFilter, isNightTime, isRainActive]);
+  }, [layersData, showBlackspots, showSegments, showHazards, isNightTime, isRainActive]);
 
   return (
-    <div className={`relative w-full h-[calc(100vh-64px)] overflow-hidden map-theme-${basemapStyle}`}>
+    <div className={`relative w-full h-[calc(100vh-65px)] overflow-hidden map-theme-${basemapStyle} font-sans`}>
       {/* Map Canvas */}
       <div ref={mapContainerRef} className="w-full h-full z-0" />
 
-      {/* Floating Top Telemetry & Weather Bar */}
-      <div className="absolute top-3 left-3 right-3 z-10 flex flex-wrap items-center justify-between gap-2 pointer-events-none">
+      {/* Floating Top Island: Telemetry & Basemap Switcher */}
+      <div className="absolute top-3.5 left-4 right-4 z-10 flex flex-wrap items-center justify-between gap-3 pointer-events-none">
         {/* Left Telemetry Pill */}
-        <div className="pointer-events-auto flex items-center space-x-2 bg-slate-900/85 backdrop-blur-xl border border-slate-700/60 rounded-xl px-3 py-1.5 shadow-2xl text-xs">
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-          <span className="font-bold text-slate-200 tracking-tight">BENGALURU GIS COMMAND</span>
-          <span className="text-slate-500">|</span>
-          <span className="text-slate-400 font-mono text-[11px]">250 Links • 16 Blackspots</span>
+        <div className="pointer-events-auto flex items-center space-x-3 glass-card px-3.5 py-2 rounded-2xl shadow-2xl">
+          <span className="relative flex h-2.5 w-2.5">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+          </span>
+          <div className="flex items-center space-x-2 text-xs">
+            <span className="font-display font-bold text-white tracking-tight">BENGALURU GIS RADAR</span>
+            <span className="text-white/20">|</span>
+            <span className="font-mono text-[11px] text-cyan-300">250 LINKS • 16 BLACKSPOTS</span>
+          </div>
         </div>
 
-        {/* Center/Right Weather & Context HUD */}
-        <div className="pointer-events-auto flex items-center space-x-2">
+        {/* Center / Right Weather & Basemap Dock */}
+        <div className="pointer-events-auto flex items-center space-x-2.5">
           {liveWeather && (
-            <div className="hidden sm:flex items-center space-x-2 bg-slate-900/85 backdrop-blur-xl border border-slate-700/60 rounded-xl px-3 py-1.5 shadow-2xl text-xs text-slate-200">
-              <CloudLightning className="w-3.5 h-3.5 text-blue-400 animate-pulse" />
-              <span className="font-semibold">{liveWeather.temperature_c}°C</span>
+            <div className="hidden sm:flex items-center space-x-2.5 glass-card px-3.5 py-2 rounded-2xl shadow-2xl text-xs text-slate-200">
+              <CloudLightning className="w-4 h-4 text-cyan-400 animate-pulse" />
+              <span className="font-mono font-bold text-white">{liveWeather.temperature_c}°C</span>
               <span className="text-slate-400 text-[11px]">• {liveWeather.weather_condition}</span>
               {liveWeather.is_precipitation_active && (
-                <span className="px-1.5 py-0.5 rounded text-[9px] bg-cyan-500/20 text-cyan-300 font-bold border border-cyan-500/30">
+                <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
                   RAIN ACTIVE
                 </span>
               )}
             </div>
           )}
 
-          {/* Basemap Switcher */}
-          <div className="flex items-center bg-slate-900/90 backdrop-blur-xl border border-slate-700/60 rounded-xl p-0.5 shadow-2xl text-[11px]">
+          {/* Designer Basemap Mode Selector */}
+          <div className="flex items-center bg-[#0D0F15]/90 backdrop-blur-2xl border border-white/10 rounded-2xl p-1 shadow-2xl text-xs font-medium">
             <button
               onClick={() => setBasemapStyle('dark')}
-              className={`px-2.5 py-1 rounded-lg font-medium transition-all ${
+              className={`px-3 py-1.5 rounded-xl transition-all duration-200 ${
                 basemapStyle === 'dark' 
-                  ? 'bg-blue-600 text-white font-bold shadow-sm' 
+                  ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-semibold shadow-md' 
                   : 'text-slate-400 hover:text-white'
               }`}
             >
-              🌙 Dark
+              🌙 Obsidian
             </button>
             <button
               onClick={() => setBasemapStyle('satellite')}
-              className={`px-2.5 py-1 rounded-lg font-medium transition-all ${
+              className={`px-3 py-1.5 rounded-xl transition-all duration-200 ${
                 basemapStyle === 'satellite' 
-                  ? 'bg-blue-600 text-white font-bold shadow-sm' 
+                  ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-semibold shadow-md' 
                   : 'text-slate-400 hover:text-white'
               }`}
             >
@@ -412,9 +406,9 @@ export const MapExplorer: React.FC<MapExplorerProps> = ({ onSelectSegment, onOpe
             </button>
             <button
               onClick={() => setBasemapStyle('standard')}
-              className={`px-2.5 py-1 rounded-lg font-medium transition-all ${
+              className={`px-3 py-1.5 rounded-xl transition-all duration-200 ${
                 basemapStyle === 'standard' 
-                  ? 'bg-blue-600 text-white font-bold shadow-sm' 
+                  ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-semibold shadow-md' 
                   : 'text-slate-400 hover:text-white'
               }`}
             >
@@ -424,110 +418,115 @@ export const MapExplorer: React.FC<MapExplorerProps> = ({ onSelectSegment, onOpe
         </div>
       </div>
 
-      {/* Floating Interactive Controls Panel (Left) */}
-      <div className={`absolute top-14 left-3 z-10 w-80 max-w-[calc(100vw-1.5rem)] bg-slate-900/90 backdrop-blur-xl border border-slate-700/60 rounded-2xl shadow-2xl text-xs transition-all duration-300 ${
-        isControlsExpanded ? 'p-3.5 space-y-3' : 'p-2.5 w-auto'
+      {/* Floating Tactical Island (Left Side) */}
+      <div className={`absolute top-16 left-4 z-10 w-80 max-w-[calc(100vw-2rem)] glass-card-elevated rounded-3xl shadow-2xl text-xs transition-all duration-300 ${
+        isPanelOpen ? 'p-4 space-y-3.5' : 'p-3 w-auto'
       }`}>
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2 font-bold text-slate-100">
-            <Layers className="w-4 h-4 text-blue-400" />
-            {isControlsExpanded && <span>Layers & Simulation</span>}
+          <div className="flex items-center space-x-2 font-display font-bold text-white text-sm">
+            <Layers className="w-4 h-4 text-cyan-400" />
+            {isPanelOpen && <span>Tactical Layers &amp; Simulation</span>}
           </div>
           <button
-            onClick={() => setIsControlsExpanded(!isControlsExpanded)}
-            className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-all"
-            title={isControlsExpanded ? 'Collapse HUD' : 'Expand HUD'}
+            onClick={() => setIsPanelOpen(!isPanelOpen)}
+            className="p-1 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition-all"
+            title={isPanelOpen ? 'Collapse Controls' : 'Expand Controls'}
           >
-            {isControlsExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            {isPanelOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
           </button>
         </div>
 
-        {isControlsExpanded && (
+        {isPanelOpen && (
           <>
-            {/* Quick Landmark Search (Nominatim) */}
+            {/* Search Input with ⌘K Style */}
             <form onSubmit={handleSearchSubmit} className="relative">
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search junction (Silk Board, Hebbal...)"
-                className="w-full bg-slate-950/80 border border-slate-700/80 rounded-xl py-1.5 pl-8 pr-3 text-slate-200 text-xs focus:outline-none focus:border-blue-500 placeholder:text-slate-500"
+                placeholder="Jump to junction (Silk Board, Hebbal...)"
+                className="w-full bg-[#08090D] border border-white/10 rounded-2xl py-2 pl-9 pr-3 text-slate-200 text-xs focus:outline-none focus:border-cyan-500/80 focus:ring-1 focus:ring-cyan-500/50 transition-all placeholder:text-slate-500"
               />
-              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" />
+              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
             </form>
 
             {/* Quick Hub Jump Pills */}
-            <div className="flex flex-wrap gap-1">
-              {Object.keys(BENGALURU_LANDMARKS).slice(0, 5).map((place) => (
-                <button
-                  key={place}
-                  type="button"
-                  onClick={() => handleJumpToLandmark(BENGALURU_LANDMARKS[place].coords)}
-                  className="text-[10px] px-2 py-0.5 rounded-full bg-slate-800/80 hover:bg-blue-600 hover:text-white text-slate-300 border border-slate-700/60 transition-all"
-                >
-                  {place}
-                </button>
-              ))}
+            <div className="space-y-1.5">
+              <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block">
+                Corridor Fly-To:
+              </span>
+              <div className="flex flex-wrap gap-1.5">
+                {Object.keys(BENGALURU_HUBS).slice(0, 6).map((hub) => (
+                  <button
+                    key={hub}
+                    type="button"
+                    onClick={() => handleJumpToHub(BENGALURU_HUBS[hub].coords)}
+                    className="text-[10px] font-medium px-2.5 py-1 rounded-xl bg-white/[0.05] hover:bg-cyan-500/20 hover:text-cyan-300 hover:border-cyan-500/40 border border-white/[0.08] text-slate-300 transition-all active:scale-95"
+                  >
+                    {hub}
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* Layer Visibility Toggles */}
-            <div className="space-y-1.5 pt-2 border-t border-slate-800/80">
-              <label className="flex items-center justify-between cursor-pointer hover:bg-slate-800/40 px-2 py-1.5 rounded-lg transition-all">
-                <div className="flex items-center space-x-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.6)]"></span>
-                  <span className="text-slate-200 font-medium">BTP Fatal Blackspots (16)</span>
+            <div className="space-y-1.5 pt-2 border-t border-white/[0.08]">
+              <label className="flex items-center justify-between cursor-pointer hover:bg-white/[0.04] px-2.5 py-1.5 rounded-xl transition-all">
+                <div className="flex items-center space-x-2.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#FF2E5B] shadow-[0_0_10px_rgba(255,46,91,0.6)]"></span>
+                  <span className="text-slate-200 font-medium">BTP Fatal Corridors (16)</span>
                 </div>
                 <input
                   type="checkbox"
                   checked={showBlackspots}
                   onChange={(e) => setShowBlackspots(e.target.checked)}
-                  className="rounded bg-slate-950 border-slate-700 text-blue-600 focus:ring-0 cursor-pointer"
+                  className="rounded bg-[#08090D] border-white/20 text-cyan-500 focus:ring-0 cursor-pointer"
                 />
               </label>
 
-              <label className="flex items-center justify-between cursor-pointer hover:bg-slate-800/40 px-2 py-1.5 rounded-lg transition-all">
-                <div className="flex items-center space-x-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.6)]"></span>
-                  <span className="text-slate-200 font-medium">OSM ML Risk Links (250)</span>
+              <label className="flex items-center justify-between cursor-pointer hover:bg-white/[0.04] px-2.5 py-1.5 rounded-xl transition-all">
+                <div className="flex items-center space-x-2.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#00F59B] shadow-[0_0_10px_rgba(0,245,155,0.6)]"></span>
+                  <span className="text-slate-200 font-medium">OSM ML Risk Segments (250)</span>
                 </div>
                 <input
                   type="checkbox"
                   checked={showSegments}
                   onChange={(e) => setShowSegments(e.target.checked)}
-                  className="rounded bg-slate-950 border-slate-700 text-blue-600 focus:ring-0 cursor-pointer"
+                  className="rounded bg-[#08090D] border-white/20 text-cyan-500 focus:ring-0 cursor-pointer"
                 />
               </label>
 
-              <label className="flex items-center justify-between cursor-pointer hover:bg-slate-800/40 px-2 py-1.5 rounded-lg transition-all">
-                <div className="flex items-center space-x-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-indigo-400 shadow-[0_0_8px_rgba(129,140,248,0.6)]"></span>
-                  <span className="text-slate-200 font-medium">Citizen Hazard Reports</span>
+              <label className="flex items-center justify-between cursor-pointer hover:bg-white/[0.04] px-2.5 py-1.5 rounded-xl transition-all">
+                <div className="flex items-center space-x-2.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#FFB800] shadow-[0_0_10px_rgba(255,184,0,0.6)]"></span>
+                  <span className="text-slate-200 font-medium">Citizen Hazard Points (120)</span>
                 </div>
                 <input
                   type="checkbox"
                   checked={showHazards}
                   onChange={(e) => setShowHazards(e.target.checked)}
-                  className="rounded bg-slate-950 border-slate-700 text-blue-600 focus:ring-0 cursor-pointer"
+                  className="rounded bg-[#08090D] border-white/20 text-cyan-500 focus:ring-0 cursor-pointer"
                 />
               </label>
             </div>
 
             {/* Real-Time Context Simulation Engine */}
-            <div className="pt-2 border-t border-slate-800/80 space-y-1.5">
+            <div className="pt-2 border-t border-white/[0.08] space-y-2">
               <div className="flex items-center justify-between text-[11px] text-slate-400">
-                <span className="font-semibold flex items-center gap-1">
-                  <Radio className="w-3 h-3 text-blue-400 animate-pulse" />
+                <span className="font-semibold flex items-center gap-1.5 text-slate-300">
+                  <Radio className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
                   Context Simulation:
                 </span>
-                <span className="text-[10px] text-blue-400 font-mono">Modulates ML Risk</span>
+                <span className="font-mono text-[10px] text-cyan-300">Modulates ML Surface</span>
               </div>
-              <div className="grid grid-cols-2 gap-1.5">
+              <div className="grid grid-cols-2 gap-2">
                 <button
                   onClick={() => setIsNightTime(isNightTime ? 0 : 1)}
-                  className={`flex items-center justify-center space-x-1.5 py-1.5 px-2 rounded-xl border text-[11px] font-semibold transition-all ${
+                  className={`flex items-center justify-center space-x-1.5 py-2 px-2.5 rounded-xl border text-[11px] font-semibold transition-all duration-200 ${
                     isNightTime
-                      ? 'bg-indigo-950/70 border-indigo-500/60 text-indigo-200 shadow-md shadow-indigo-500/10'
-                      : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:text-white'
+                      ? 'bg-indigo-950/70 border-indigo-500/50 text-indigo-200 shadow-lg shadow-indigo-500/10'
+                      : 'bg-[#08090D] border-white/10 text-slate-400 hover:text-white'
                   }`}
                 >
                   {isNightTime ? <Moon className="w-3.5 h-3.5 text-indigo-400" /> : <Sun className="w-3.5 h-3.5 text-amber-400" />}
@@ -536,10 +535,10 @@ export const MapExplorer: React.FC<MapExplorerProps> = ({ onSelectSegment, onOpe
 
                 <button
                   onClick={() => setIsRainActive(isRainActive ? 0 : 1)}
-                  className={`flex items-center justify-center space-x-1.5 py-1.5 px-2 rounded-xl border text-[11px] font-semibold transition-all ${
+                  className={`flex items-center justify-center space-x-1.5 py-2 px-2.5 rounded-xl border text-[11px] font-semibold transition-all duration-200 ${
                     isRainActive
-                      ? 'bg-cyan-950/70 border-cyan-500/60 text-cyan-200 shadow-md shadow-cyan-500/10'
-                      : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:text-white'
+                      ? 'bg-cyan-950/70 border-cyan-500/50 text-cyan-200 shadow-lg shadow-cyan-500/10'
+                      : 'bg-[#08090D] border-white/10 text-slate-400 hover:text-white'
                   }`}
                 >
                   <CloudRain className="w-3.5 h-3.5 text-cyan-400" />
@@ -548,33 +547,33 @@ export const MapExplorer: React.FC<MapExplorerProps> = ({ onSelectSegment, onOpe
               </div>
             </div>
 
-            {/* Quick Tip */}
-            <div className="bg-blue-950/30 border border-blue-900/40 rounded-xl p-2 text-[10px] text-blue-300 flex items-start space-x-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-blue-400 flex-shrink-0 mt-0.5" />
-              <span>Click any road segment line to open its <strong>SHAP Factor AI Attribution Card</strong>. Click any empty spot to submit a hazard report.</span>
+            {/* Interaction Hint */}
+            <div className="bg-cyan-500/10 border border-cyan-500/20 rounded-2xl p-2.5 text-[11px] text-cyan-300 flex items-start space-x-2">
+              <Sparkles className="w-4 h-4 text-cyan-400 flex-shrink-0 mt-0.5" />
+              <span>Click on any road link to view its <strong>SHAP Factor AI Attribution Card</strong>. Click any open map point to submit a citizen report.</span>
             </div>
           </>
         )}
       </div>
 
-      {/* Floating Tactical Legend (Bottom Left) */}
-      <div className="absolute bottom-4 left-4 z-10 bg-slate-900/90 backdrop-blur-xl border border-slate-700/60 rounded-xl p-3 shadow-2xl text-[11px] space-y-2 hidden md:block">
-        <div className="flex items-center justify-between text-slate-200 font-bold border-b border-slate-800 pb-1">
-          <span>Risk Classification</span>
-          <span className="text-[10px] font-mono text-slate-400">Calibrated Platt Scale</span>
+      {/* Floating Tactical Legend (Bottom Left Dock) */}
+      <div className="absolute bottom-4 left-4 z-10 glass-card px-4 py-3 rounded-2xl shadow-2xl text-[11px] space-y-1.5 hidden md:block">
+        <div className="flex items-center justify-between text-slate-200 font-display font-bold border-b border-white/10 pb-1.5 gap-4">
+          <span>Risk Surface Hierarchy</span>
+          <span className="text-[10px] font-mono text-cyan-400">Platt Calibrated</span>
         </div>
-        <div className="space-y-1.5">
+        <div className="flex items-center space-x-4 pt-0.5">
           <div className="flex items-center space-x-2 text-slate-300">
-            <span className="w-5 h-2 rounded bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
-            <span>Low Exposure (&lt; 28%)</span>
+            <span className="w-3.5 h-2 rounded bg-[#00F59B] shadow-[0_0_8px_rgba(0,245,155,0.6)]"></span>
+            <span>&lt; 28% Low</span>
           </div>
           <div className="flex items-center space-x-2 text-slate-300">
-            <span className="w-5 h-2 rounded bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]"></span>
-            <span>Moderate Hazard (28% - 58%)</span>
+            <span className="w-3.5 h-2 rounded bg-[#FFB800] shadow-[0_0_8px_rgba(255,184,0,0.6)]"></span>
+            <span>28–58% Moderate</span>
           </div>
           <div className="flex items-center space-x-2 text-slate-300">
-            <span className="w-5 h-2 rounded bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]"></span>
-            <span>Elevated / Chronic Blackspot (&gt; 58%)</span>
+            <span className="w-3.5 h-2 rounded bg-[#FF2E5B] shadow-[0_0_8px_rgba(255,46,91,0.6)]"></span>
+            <span>&gt; 58% Critical</span>
           </div>
         </div>
       </div>
