@@ -7641,32 +7641,37 @@ export function calculateClientRouteEvaluation(
             Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
             Math.sin(dLon/2) * Math.sin(dLon/2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-  const straightDist = Math.max(1.2, Math.round(R * c * 10) / 10);
+  const straightDist = Math.max(0.6, Math.round(R * c * 10) / 10);
 
-  // Generate 5-point curved waypoints for Route 1 (Primary Arterial)
+  // Generate 7-point curved waypoints for Route 1 (Primary Arterial)
   const waypoints1: [number, number][] = [
     [lat1, lon1],
-    [lat1 * 0.75 + lat2 * 0.25 + 0.008, lon1 * 0.75 + lon2 * 0.25 + 0.006],
+    [lat1 * 0.85 + lat2 * 0.15 + 0.005, lon1 * 0.85 + lon2 * 0.15 + 0.004],
+    [lat1 * 0.65 + lat2 * 0.35 + 0.010, lon1 * 0.65 + lon2 * 0.35 + 0.008],
     [(lat1 + lat2) / 2 + 0.012, (lon1 + lon2) / 2 + 0.012],
-    [lat1 * 0.25 + lat2 * 0.75 + 0.006, lon1 * 0.25 + lon2 * 0.75 + 0.008],
+    [lat1 * 0.35 + lat2 * 0.65 + 0.008, lon1 * 0.35 + lon2 * 0.65 + 0.010],
+    [lat1 * 0.15 + lat2 * 0.85 + 0.004, lon1 * 0.15 + lon2 * 0.85 + 0.005],
     [lat2, lon2]
   ];
 
-  // Generate 5-point curved waypoints for Route 2 (Secondary Safer Bypass)
+  // Generate 7-point curved waypoints for Route 2 (Secondary Safer Bypass)
   const waypoints2: [number, number][] = [
     [lat1, lon1],
-    [lat1 * 0.75 + lat2 * 0.25 - 0.010, lon1 * 0.75 + lon2 * 0.25 - 0.010],
-    [(lat1 + lat2) / 2 - 0.015, (lon1 + lon2) / 2 - 0.015],
-    [lat1 * 0.25 + lat2 * 0.75 - 0.008, lon1 * 0.25 + lon2 * 0.75 - 0.010],
+    [lat1 * 0.85 + lat2 * 0.15 - 0.006, lon1 * 0.85 + lon2 * 0.15 - 0.006],
+    [lat1 * 0.65 + lat2 * 0.35 - 0.012, lon1 * 0.65 + lon2 * 0.35 - 0.012],
+    [(lat1 + lat2) / 2 - 0.016, (lon1 + lon2) / 2 - 0.016],
+    [lat1 * 0.35 + lat2 * 0.65 - 0.010, lon1 * 0.35 + lon2 * 0.65 - 0.012],
+    [lat1 * 0.15 + lat2 * 0.85 - 0.005, lon1 * 0.15 + lon2 * 0.85 - 0.006],
     [lat2, lon2]
   ];
 
-  const dist1 = Math.round(straightDist * 1.2 * 10) / 10;
-  const time1 = Math.round((dist1 / 28) * 60);
+  // Distinct distances and durations
+  const dist1 = Math.max(1.4, Math.round(straightDist * 1.24 * 10) / 10);
+  const time1 = Math.max(6, Math.round((dist1 / 28) * 60));
   const exposure1 = Math.round(dist1 * 0.58 * 10) / 10;
 
-  const dist2 = Math.round(straightDist * 1.35 * 10) / 10;
-  const time2 = Math.round((dist2 / 25) * 60);
+  const dist2 = Math.max(1.8, Math.round(straightDist * 1.42 * 10) / 10);
+  const time2 = Math.max(8, Math.round((dist2 / 24) * 60));
   const exposure2 = Math.round(dist2 * 0.31 * 10) / 10;
 
   return {

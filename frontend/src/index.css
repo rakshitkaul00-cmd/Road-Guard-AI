@@ -81,6 +81,23 @@
   background: #2D344B;
 }
 
+/* High-Contrast, Visible Scrollbar for Route Places Dropdowns */
+.custom-dropdown-scrollbar::-webkit-scrollbar {
+  width: 7px !important;
+}
+.custom-dropdown-scrollbar::-webkit-scrollbar-track {
+  background: rgba(13, 16, 26, 0.95) !important;
+  border-radius: 9999px;
+}
+.custom-dropdown-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(56, 189, 248, 0.45) !important;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+.custom-dropdown-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(56, 189, 248, 0.8) !important;
+}
+
 /* Leaflet Container & Basemap Theming */
 .leaflet-container {
   width: 100%;
@@ -182,3 +199,26 @@
 .interactive-hover:active {
   transform: translateY(0px) scale(0.98);
 }
+
+/* High-contrast smooth scrollbar for location dropdowns */
+.custom-dropdown-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+.custom-dropdown-scrollbar::-webkit-scrollbar-track {
+  background: rgba(13, 16, 26, 0.95);
+  border-radius: 9999px;
+  margin: 6px 0;
+}
+.custom-dropdown-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(56, 189, 248, 0.45);
+  border-radius: 9999px;
+  border: 2px solid rgba(13, 16, 26, 0.95);
+}
+.custom-dropdown-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(56, 189, 248, 0.75);
+}
+.custom-dropdown-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(56, 189, 248, 0.45) rgba(13, 16, 26, 0.95);
+}
+

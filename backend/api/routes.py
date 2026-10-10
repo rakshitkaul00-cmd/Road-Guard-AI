@@ -56,12 +56,12 @@ def evaluate_routes(payload: RouteEvaluationRequest):
         pass
 
     # Route A: High-Capacity Arterial Corridor (e.g., via Outer Ring Road / NH-44)
-    dist_a = live_dist_km if live_dist_km else round(straight_dist_km * 1.25, 2)
-    time_a = live_duration_mins if live_duration_mins else round(dist_a / 28.0 * 60, 1)
-    bs_count_a = 2
+    dist_a = live_dist_km if live_dist_km else max(1.4, round(straight_dist_km * 1.24, 1))
+    time_a = live_duration_mins if live_duration_mins else max(6, round(dist_a / 28.0 * 60))
+    bs_count_a = 3 if straight_dist_km > 10 else (2 if straight_dist_km > 5 else 1)
     mean_risk_a = 0.58
-    exposure_a = round(dist_a * mean_risk_a, 2)
-    hazards_a = 5
+    exposure_a = round(dist_a * mean_risk_a, 1)
+    hazards_a = max(2, round(straight_dist_km * 0.45))
 
     # Waypoints for Route A (arterial detour)
     mid_lat_a = (orig_lat + dest_lat) / 2 + 0.015
@@ -73,12 +73,12 @@ def evaluate_routes(payload: RouteEvaluationRequest):
     ]
 
     # Route B: Inner Urban Arterial / Secondary Link Route
-    dist_b = round(straight_dist_km * 1.35, 2)
-    time_b = round(dist_b / 24.0 * 60, 1)  # average 24 km/h
-    bs_count_b = 0
-    mean_risk_b = 0.29
-    exposure_b = round(dist_b * mean_risk_b, 2)
-    hazards_b = 2
+    dist_b = max(1.8, round(straight_dist_km * 1.42, 1))
+    time_b = max(8, round(dist_b / 24.0 * 60))  # average 24 km/h
+    bs_count_b = 1 if straight_dist_km > 12 else 0
+    mean_risk_b = 0.31
+    exposure_b = round(dist_b * mean_risk_b, 1)
+    hazards_b = max(1, round(straight_dist_km * 0.20))
 
     # Waypoints for Route B (secondary bypass)
     mid_lat_b = (orig_lat + dest_lat) / 2 - 0.012

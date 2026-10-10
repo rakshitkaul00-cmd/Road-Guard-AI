@@ -15,39 +15,100 @@ interface PlaceOption {
 }
 
 const BENGALURU_PLACES: PlaceOption[] = [
-  { id: 'hebbal', name: 'Hebbal Flyover (North)', coords: [13.0358, 77.5970], category: 'Corridor Spine' },
-  { id: 'silkboard', name: 'Central Silk Board Junction (South)', coords: [12.9176, 77.6238], category: 'Major Hub' },
-  { id: 'indiranagar', name: 'Indiranagar 100ft Road', coords: [12.9784, 77.6408], category: 'Commercial' },
-  { id: 'koramangala', name: 'Koramangala Sony World', coords: [12.9345, 77.6271], category: 'Commercial' },
-  { id: 'peenya', name: 'Peenya 8th Mile (West)', coords: [13.0458, 77.5029], category: 'Industrial' },
-  { id: 'ecity', name: 'Electronic City Phase 1 (South)', coords: [12.8452, 77.6602], category: 'Tech Hub' },
-  { id: 'whitefield', name: 'Whitefield ITPB / Hope Farm (East)', coords: [12.9840, 77.7516], category: 'Tech Hub' },
-  { id: 'majestic', name: 'Majestic Kempegowda Station (Central)', coords: [12.9767, 77.5713], category: 'Transit Hub' },
-  { id: 'airport', name: 'KIA Bengaluru Airport Toll', coords: [13.2014, 77.7108], category: 'Airport' },
-  { id: 'marathahalli', name: 'Marathahalli Multiplex Junction', coords: [12.9562, 77.7011], category: 'Tech Corridor' },
-  { id: 'mgroad', name: 'MG Road / Brigade Road (CBD)', coords: [12.9740, 77.6080], category: 'CBD' },
-  { id: 'jayanagar', name: 'Jayanagar 4th Block', coords: [12.9348, 77.5786], category: 'Residential' },
-  { id: 'malleshwaram', name: 'Malleshwaram 8th Cross', coords: [13.0041, 77.5701], category: 'Commercial' },
-  { id: 'bellandur', name: 'Bellandur EcoSpace (ORR)', coords: [12.9260, 77.6762], category: 'Tech Corridor' },
-  { id: 'sarjapur', name: 'Sarjapur Road (Wipro Gate)', coords: [12.9103, 77.6850], category: 'Corridor' },
-  { id: 'hsr', name: 'HSR Layout 27th Main', coords: [12.9116, 77.6389], category: 'Residential' },
-  { id: 'yeshwanthpur', name: 'Yeshwanthpur Govardhan Circle', coords: [13.0238, 77.5513], category: 'Transit Hub' },
-  { id: 'goragunte', name: 'Goraguntepalya CMTI Flyover', coords: [13.0285, 77.5408], category: 'Blackspot' },
-  { id: 'tinfactory', name: 'Tin Factory / KR Puram Bridge', coords: [12.9972, 77.6698], category: 'Blackspot' }
+  // --- Priority BTP Blackspots & Major Arterial Hubs ---
+  { id: 'silkboard', name: 'Central Silk Board Junction (South Core)', coords: [12.9176, 77.6238], category: 'Major Hub' },
+  { id: 'hebbal', name: 'Hebbal Flyover & Junction (North Spine)', coords: [13.0358, 77.5970], category: 'Major Hub' },
+  { id: 'tinfactory', name: 'Tin Factory / KR Puram Bridge (East)', coords: [12.9972, 77.6698], category: 'Blackspot' },
+  { id: 'goragunte', name: 'Goraguntepalya / CMTI Flyover (Tumakuru Rd)', coords: [13.0285, 77.5408], category: 'Blackspot' },
+  { id: 'peenya', name: 'Peenya 8th Mile / Jalahalli Cross (NH-48)', coords: [13.0458, 77.5029], category: 'Blackspot' },
+  { id: 'marathahalli', name: 'Marathahalli Multiplex & Bridge (ORR)', coords: [12.9562, 77.7011], category: 'Blackspot' },
+  { id: 'bellandur', name: 'Bellandur EcoSpace / Flyover Descent', coords: [12.9260, 77.6762], category: 'Blackspot' },
+  { id: 'dairycircle', name: 'Dairy Circle / Bannerghatta Road', coords: [12.9372, 77.5995], category: 'Major Hub' },
+  { id: 'mekhri', name: 'Mekhri Circle / Bellary Road (Palace Grounds)', coords: [13.0076, 77.5843], category: 'Major Hub' },
+  { id: 'yeshwanthpur-cir', name: 'Yeshwanthpur Govardhan Circle', coords: [13.0238, 77.5513], category: 'Major Hub' },
+  { id: 'domlur', name: 'Domlur Flyover / EGL Corridor', coords: [12.9609, 77.6387], category: 'Major Hub' },
+  { id: 'richmond', name: 'Richmond Circle / Residency Road', coords: [12.9664, 77.5996], category: 'CBD' },
+  { id: 'corporation', name: 'Corporation Circle / Hudson Circle', coords: [12.9678, 77.5886], category: 'CBD' },
+  { id: 'kengeri', name: 'Kengeri Satellite Bus Stand (Mysuru Rd)', coords: [12.9125, 77.4839], category: 'Major Hub' },
+  { id: 'nayandahalli', name: 'Nayandahalli Junction (Mysuru Rd / ORR)', coords: [12.9463, 77.5255], category: 'Major Hub' },
+  { id: 'nagavara', name: 'Nagavara Junction / Manyata Gate (ORR)', coords: [13.0435, 77.6208], category: 'Tech Corridor' },
+
+  // --- Tech Parks & IT Corridors ---
+  { id: 'ecity-p1', name: 'Electronic City Phase 1 (Infosys/Wipro)', coords: [12.8452, 77.6602], category: 'Tech Corridor' },
+  { id: 'ecity-p2', name: 'Electronic City Phase 2 (TCS/Tech M)', coords: [12.8415, 77.6833], category: 'Tech Corridor' },
+  { id: 'whitefield-itpb', name: 'Whitefield ITPB / Hope Farm', coords: [12.9840, 77.7516], category: 'Tech Corridor' },
+  { id: 'manyata', name: 'Manyata Embassy Business Park (Hebbal)', coords: [13.0494, 77.6214], category: 'Tech Corridor' },
+  { id: 'bagmane', name: 'Bagmane Tech Park (CV Raman Nagar)', coords: [12.9798, 77.6599], category: 'Tech Corridor' },
+  { id: 'ecospace', name: 'Ecospace Business Park (Bellandur)', coords: [12.9265, 77.6820], category: 'Tech Corridor' },
+  { id: 'cessna', name: 'Cessna Business Park (Kadubeesanahalli)', coords: [12.9362, 77.6934], category: 'Tech Corridor' },
+  { id: 'global-village', name: 'Global Village Tech Park (RR Nagar)', coords: [12.9174, 77.5028], category: 'Tech Corridor' },
+  { id: 'rmz-infinity', name: 'RMZ Infinity (Old Madras Road)', coords: [12.9934, 77.6607], category: 'Tech Corridor' },
+  { id: 'prestige-tech', name: 'Prestige Tech Park (Marathahalli-ORR)', coords: [12.9388, 77.6912], category: 'Tech Corridor' },
+
+  // --- Commercial, Dining & CBD Zones ---
+  { id: 'indiranagar-100ft', name: 'Indiranagar 100ft Road / 12th Main', coords: [12.9784, 77.6408], category: 'Commercial' },
+  { id: 'koramangala-sony', name: 'Koramangala Sony World / 80ft Road', coords: [12.9345, 77.6271], category: 'Commercial' },
+  { id: 'koramangala-5th', name: 'Koramangala 5th Block (Forum Mall)', coords: [12.9340, 77.6180], category: 'Commercial' },
+  { id: 'mgroad', name: 'MG Road / Brigade Road (Central CBD)', coords: [12.9740, 77.6080], category: 'CBD' },
+  { id: 'church-street', name: 'Church Street / Museum Road', coords: [12.9750, 77.6055], category: 'CBD' },
+  { id: 'commercial-st', name: 'Commercial Street / Tasker Town', coords: [12.9822, 77.6083], category: 'Commercial' },
+  { id: 'malleshwaram-8th', name: 'Malleshwaram 8th Cross (Sampige Rd)', coords: [13.0041, 77.5701], category: 'Commercial' },
+  { id: 'jayanagar-4th', name: 'Jayanagar 4th Block Complex', coords: [12.9304, 77.5835], category: 'Commercial' },
+  { id: 'gandhi-bazaar', name: 'Basavanagudi Gandhi Bazaar Circle', coords: [12.9438, 77.5704], category: 'Commercial' },
+  { id: 'kalyan-nagar', name: 'Kalyan Nagar / HRBR Layout (Kammanahalli)', coords: [13.0232, 77.6472], category: 'Commercial' },
+  { id: 'frazer-town', name: 'Frazer Town / MM Road (Pulakeshi Nagar)', coords: [12.9968, 77.6133], category: 'Commercial' },
+
+  // --- Key Residential Neighborhoods ---
+  { id: 'hsr-27th', name: 'HSR Layout 27th Main (Sector 1 & 2)', coords: [12.9116, 77.6389], category: 'Residential' },
+  { id: 'btm-2nd', name: 'BTM Layout 2nd Stage (Udupi Garden)', coords: [12.9145, 77.6105], category: 'Residential' },
+  { id: 'jp-nagar-delmia', name: 'JP Nagar 6th Phase (Delmia Circle)', coords: [12.9080, 77.5860], category: 'Residential' },
+  { id: 'jp-nagar-2nd', name: 'JP Nagar 2nd Phase / 24th Main', coords: [12.9130, 77.5930], category: 'Residential' },
+  { id: 'banashankari-bda', name: 'Banashankari BDA Complex (2nd Stage)', coords: [12.9254, 77.5736], category: 'Residential' },
+  { id: 'rajajinagar-1st', name: 'Rajajinagar 1st Block (Navrang)', coords: [12.9935, 77.5530], category: 'Residential' },
+  { id: 'vijayanagar-ttmc', name: 'Vijayanagar TTMC & Metro Hub', coords: [12.9715, 77.5372], category: 'Residential' },
+  { id: 'sadashivanagar', name: 'Sadashivanagar / Bashyam Circle', coords: [13.0089, 77.5772], category: 'Residential' },
+  { id: 'cunningham-rd', name: 'Cunningham Road / Vasanth Nagar', coords: [12.9877, 77.5954], category: 'Residential' },
+  { id: 'sahakara-nagar', name: 'Sahakara Nagar / Kodigehalli Gate', coords: [13.0615, 77.5905], category: 'Residential' },
+  { id: 'vidyaranyapura', name: 'Vidyaranyapura Main Road / Post Office', coords: [13.0782, 77.5580], category: 'Residential' },
+  { id: 'sarjapur-wipro', name: 'Sarjapur Road (Wipro Corporate Gate)', coords: [12.9103, 77.6850], category: 'Residential' },
+  { id: 'bannerghatta-gottigere', name: 'Bannerghatta Road (Gottigere / Meenakshi)', coords: [12.8652, 77.5902], category: 'Residential' },
+  { id: 'kanakapura-metro', name: 'Kanakapura Road (Silk Institute Metro)', coords: [12.8752, 77.5450], category: 'Residential' },
+  { id: 'magadi-road', name: 'Magadi Road (Prasanna Theatre / Tollgate)', coords: [12.9765, 77.5420], category: 'Residential' },
+
+  // --- Transit Terminals, Airports & Rail Terminals ---
+  { id: 'kia-airport', name: 'Kempegowda International Airport (KIA Toll)', coords: [13.2014, 77.7108], category: 'Airport' },
+  { id: 'majestic-sbc', name: 'KSR Bengaluru City Railway Station (Majestic SBC)', coords: [12.9781, 77.5695], category: 'Transit Hub' },
+  { id: 'majestic-bus', name: 'Majestic Kempegowda Bus Station (BMTC/KSRTC)', coords: [12.9767, 77.5713], category: 'Transit Hub' },
+  { id: 'yeshwanthpur-rail', name: 'Yeshwanthpur Railway Station (YPR)', coords: [13.0245, 77.5501], category: 'Transit Hub' },
+  { id: 'krpuram-rail', name: 'KR Puram Railway Station (KJM)', coords: [13.0012, 77.6890], category: 'Transit Hub' },
+  { id: 'cantonment-rail', name: 'Bengaluru Cantonment Railway Station (BNC)', coords: [12.9930, 77.5986], category: 'Transit Hub' },
+  { id: 'smvb-baiyappanahalli', name: 'Sir M. Visvesvaraya Terminal (SMVB Baiyappanahalli)', coords: [12.9928, 77.6534], category: 'Transit Hub' },
+  { id: 'shantinagar-ttmc', name: 'Shantinagar TTMC Bus Station (KSRTC)', coords: [12.9542, 77.5925], category: 'Transit Hub' },
+
+  // --- Extended Suburbs & Arterial Corridors ---
+  { id: 'yelahanka-town', name: 'Yelahanka New Town (Kogilu Cross)', coords: [13.1007, 77.6012], category: 'Residential' },
+  { id: 'devanahalli', name: 'Devanahalli Town / NH-44 Crossing', coords: [13.2480, 77.7120], category: 'Major Hub' },
+  { id: 'nelamangala-toll', name: 'Nelamangala Toll Plaza (NH-48)', coords: [13.0990, 77.3910], category: 'Major Hub' },
+  { id: 'hoskote-toll', name: 'Hoskote Toll / NH-75 Old Madras Rd', coords: [13.0710, 77.7980], category: 'Major Hub' },
+  { id: 'hoodi', name: 'Hoodi Junction (ITPL Main Road)', coords: [12.9910, 77.7160], category: 'Tech Corridor' },
+  { id: 'kadugodi', name: 'Kadugodi Tree Park / Metro Station', coords: [12.9980, 77.7600], category: 'Tech Corridor' },
+  { id: 'varthur-kodi', name: 'Varthur Kodi & Lake Circle', coords: [12.9410, 77.7420], category: 'Residential' },
+  { id: 'mahadevapura', name: 'Mahadevapura Ring Road (More Mega Store)', coords: [12.9902, 77.6875], category: 'Tech Corridor' },
+  { id: 'kundalahalli', name: 'Kundalahalli Gate (AECS Layout)', coords: [12.9645, 77.7155], category: 'Tech Corridor' }
 ];
 
 export const RouteComparison: React.FC = () => {
   // Search Inputs
-  const [originText, setOriginText] = useState('Hebbal Flyover (North)');
-  const [destText, setDestText] = useState('Central Silk Board Junction (South)');
+  const [originText, setOriginText] = useState('Hebbal Flyover & Junction (North Spine)');
+  const [destText, setDestText] = useState('Central Silk Board Junction (South Core)');
   const [originCoords, setOriginCoords] = useState<[number, number]>([13.0358, 77.5970]);
   const [destCoords, setDestCoords] = useState<[number, number]>([12.9176, 77.6238]);
 
   // Dropdown States
   const [isOriginOpen, setIsOriginOpen] = useState(false);
   const [isDestOpen, setIsDestOpen] = useState(false);
-  const [originSuggestions, setOriginSuggestions] = useState<PlaceOption[]>([]);
-  const [destSuggestions, setDestSuggestions] = useState<PlaceOption[]>([]);
+  const [originSuggestions, setOriginSuggestions] = useState<PlaceOption[]>(BENGALURU_PLACES);
+  const [destSuggestions, setDestSuggestions] = useState<PlaceOption[]>(BENGALURU_PLACES);
 
   // Route Evaluation & Map States
   const [loading, setLoading] = useState(false);
@@ -67,9 +128,9 @@ export const RouteComparison: React.FC = () => {
       title: 'Hebbal → Silk Board',
       category: 'North-South Spine',
       origin: [13.0358, 77.5970] as [number, number],
-      originName: 'Hebbal Flyover (North)',
+      originName: 'Hebbal Flyover & Junction (North Spine)',
       destination: [12.9176, 77.6238] as [number, number],
-      destName: 'Central Silk Board Junction (South)'
+      destName: 'Central Silk Board Junction (South Core)'
     },
     {
       title: 'Whitefield → Silk Board',
@@ -77,39 +138,39 @@ export const RouteComparison: React.FC = () => {
       origin: [12.9840, 77.7516] as [number, number],
       originName: 'Whitefield ITPB / Hope Farm',
       destination: [12.9176, 77.6238] as [number, number],
-      destName: 'Central Silk Board Junction'
+      destName: 'Central Silk Board Junction (South Core)'
     },
     {
       title: 'Indiranagar → Koramangala',
       category: 'East-Central Urban',
       origin: [12.9784, 77.6408] as [number, number],
-      originName: 'Indiranagar 100ft Road',
+      originName: 'Indiranagar 100ft Road / 12th Main',
       destination: [12.9345, 77.6271] as [number, number],
-      destName: 'Koramangala Sony World'
+      destName: 'Koramangala Sony World / 80ft Road'
     },
     {
       title: 'Hebbal → KIA Airport',
       category: 'Airport Expressway',
       origin: [13.0358, 77.5970] as [number, number],
-      originName: 'Hebbal Flyover',
+      originName: 'Hebbal Flyover & Junction (North Spine)',
       destination: [13.2014, 77.7108] as [number, number],
-      destName: 'KIA Airport Toll'
+      destName: 'Kempegowda International Airport (KIA Toll)'
     },
     {
       title: 'Peenya → Electronic City',
       category: 'Industrial Ring Bypass',
       origin: [13.0458, 77.5029] as [number, number],
-      originName: 'Peenya 8th Mile',
+      originName: 'Peenya 8th Mile / Jalahalli Cross (NH-48)',
       destination: [12.8452, 77.6602] as [number, number],
-      destName: 'Electronic City Phase 1'
+      destName: 'Electronic City Phase 1 (Infosys/Wipro)'
     },
     {
       title: 'Majestic → Whitefield',
       category: 'Commuter Core',
-      origin: [12.9767, 77.5713] as [number, number],
-      originName: 'Majestic Kempegowda Station',
+      origin: [12.9781, 77.5695] as [number, number],
+      originName: 'KSR Bengaluru City Railway Station (Majestic SBC)',
       destination: [12.9840, 77.7516] as [number, number],
-      destName: 'Whitefield ITPB'
+      destName: 'Whitefield ITPB / Hope Farm'
     }
   ];
 
@@ -127,26 +188,32 @@ export const RouteComparison: React.FC = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Filter Origin Suggestions
+  // Filter Origin Suggestions across all 68+ places without slicing
   useEffect(() => {
     const q = originText.trim().toLowerCase();
     if (!q) {
-      setOriginSuggestions(BENGALURU_PLACES.slice(0, 6));
+      setOriginSuggestions(BENGALURU_PLACES);
     } else {
       setOriginSuggestions(
-        BENGALURU_PLACES.filter(p => p.name.toLowerCase().includes(q) || p.category.toLowerCase().includes(q)).slice(0, 6)
+        BENGALURU_PLACES.filter(p => 
+          p.name.toLowerCase().includes(q) || 
+          p.category.toLowerCase().includes(q)
+        )
       );
     }
   }, [originText]);
 
-  // Filter Destination Suggestions
+  // Filter Destination Suggestions across all 68+ places without slicing
   useEffect(() => {
     const q = destText.trim().toLowerCase();
     if (!q) {
-      setDestSuggestions(BENGALURU_PLACES.slice(0, 6));
+      setDestSuggestions(BENGALURU_PLACES);
     } else {
       setDestSuggestions(
-        BENGALURU_PLACES.filter(p => p.name.toLowerCase().includes(q) || p.category.toLowerCase().includes(q)).slice(0, 6)
+        BENGALURU_PLACES.filter(p => 
+          p.name.toLowerCase().includes(q) || 
+          p.category.toLowerCase().includes(q)
+        )
       );
     }
   }, [destText]);
@@ -168,6 +235,21 @@ export const RouteComparison: React.FC = () => {
   useEffect(() => {
     evaluateRoute(originCoords, destCoords);
   }, []);
+
+  // Instant selection handlers that immediately update route calculation
+  const handleSelectOrigin = (place: PlaceOption) => {
+    setOriginText(place.name);
+    setOriginCoords(place.coords);
+    setIsOriginOpen(false);
+    evaluateRoute(place.coords, destCoords);
+  };
+
+  const handleSelectDest = (place: PlaceOption) => {
+    setDestText(place.name);
+    setDestCoords(place.coords);
+    setIsDestOpen(false);
+    evaluateRoute(originCoords, place.coords);
+  };
 
   const handleApplyShortcut = (shortcut: typeof popularShortcuts[0]) => {
     setOriginText(shortcut.originName);
@@ -195,7 +277,22 @@ export const RouteComparison: React.FC = () => {
     e.preventDefault();
     setIsOriginOpen(false);
     setIsDestOpen(false);
-    evaluateRoute(originCoords, destCoords);
+
+    let curOrig = originCoords;
+    const matchOrig = BENGALURU_PLACES.find(p => p.name.toLowerCase().includes(originText.toLowerCase()));
+    if (matchOrig) {
+      curOrig = matchOrig.coords;
+      setOriginCoords(matchOrig.coords);
+    }
+
+    let curDest = destCoords;
+    const matchDest = BENGALURU_PLACES.find(p => p.name.toLowerCase().includes(destText.toLowerCase()));
+    if (matchDest) {
+      curDest = matchDest.coords;
+      setDestCoords(matchDest.coords);
+    }
+
+    evaluateRoute(curOrig, curDest);
   };
 
   // Initialize Route Visualizer Leaflet Map
@@ -346,7 +443,7 @@ export const RouteComparison: React.FC = () => {
 
         <form onSubmit={handleSubmitSearch} className="flex flex-col lg:flex-row items-stretch lg:items-center gap-3">
           {/* Origin Input */}
-          <div ref={originContainerRef} className="relative flex-1">
+          <div ref={originContainerRef} className={`relative flex-1 ${isOriginOpen ? 'z-40' : 'z-20'}`}>
             <div className="relative flex items-center">
               <div className="absolute left-3.5 flex items-center pointer-events-none">
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#00F59B]"></span>
@@ -378,23 +475,23 @@ export const RouteComparison: React.FC = () => {
 
             {/* Origin Dropdown Suggestions */}
             {isOriginOpen && originSuggestions.length > 0 && (
-              <div className="absolute top-full left-0 right-0 mt-1.5 bg-[#0D101A]/95 backdrop-blur-2xl border border-white/15 rounded-2xl shadow-2xl overflow-hidden z-50 max-h-56 overflow-y-auto divide-y divide-white/[0.06]">
+              <div className="absolute top-full left-0 right-0 mt-2 bg-[#0C0F17]/98 backdrop-blur-2xl border border-white/20 rounded-2xl shadow-2xl z-50 max-h-80 overflow-y-auto overflow-x-hidden divide-y divide-white/[0.06] custom-dropdown-scrollbar">
+                <div className="sticky top-0 z-10 px-3.5 py-2 bg-[#090C14]/95 backdrop-blur-md border-b border-white/10 flex items-center justify-between text-[11px] font-mono text-cyan-400 font-bold">
+                  <span>📍 {originSuggestions.length} Bengaluru Locations</span>
+                  <span className="text-[10px] text-slate-400 font-normal">Scroll to explore</span>
+                </div>
                 {originSuggestions.map((place) => (
                   <button
                     key={place.id}
                     type="button"
-                    onClick={() => {
-                      setOriginText(place.name);
-                      setOriginCoords(place.coords);
-                      setIsOriginOpen(false);
-                    }}
-                    className="w-full px-3.5 py-2.5 text-left flex items-center justify-between hover:bg-cyan-500/10 transition-colors"
+                    onClick={() => handleSelectOrigin(place)}
+                    className="w-full px-3.5 py-2.5 text-left flex items-center justify-between hover:bg-cyan-500/10 transition-colors group"
                   >
-                    <div className="flex items-center space-x-2.5">
-                      <MapPin className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                      <span className="text-xs font-semibold text-slate-200">{place.name}</span>
+                    <div className="flex items-center space-x-2.5 truncate">
+                      <MapPin className="w-3.5 h-3.5 text-emerald-400 shrink-0 group-hover:scale-110 transition-transform" />
+                      <span className="text-xs font-semibold text-slate-200 truncate group-hover:text-white">{place.name}</span>
                     </div>
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-white/[0.06] text-slate-400">
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-white/[0.06] text-slate-400 shrink-0 ml-2">
                       {place.category}
                     </span>
                   </button>
@@ -414,7 +511,7 @@ export const RouteComparison: React.FC = () => {
           </button>
 
           {/* Destination Input */}
-          <div ref={destContainerRef} className="relative flex-1">
+          <div ref={destContainerRef} className={`relative flex-1 ${isDestOpen ? 'z-40' : 'z-20'}`}>
             <div className="relative flex items-center">
               <div className="absolute left-3.5 flex items-center pointer-events-none">
                 <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-[0_0_8px_#00E5FF]"></span>
@@ -446,23 +543,23 @@ export const RouteComparison: React.FC = () => {
 
             {/* Destination Dropdown Suggestions */}
             {isDestOpen && destSuggestions.length > 0 && (
-              <div className="absolute top-full left-0 right-0 mt-1.5 bg-[#0D101A]/95 backdrop-blur-2xl border border-white/15 rounded-2xl shadow-2xl overflow-hidden z-50 max-h-56 overflow-y-auto divide-y divide-white/[0.06]">
+              <div className="absolute top-full left-0 right-0 mt-2 bg-[#0C0F17]/98 backdrop-blur-2xl border border-white/20 rounded-2xl shadow-2xl z-50 max-h-80 overflow-y-auto overflow-x-hidden divide-y divide-white/[0.06] custom-dropdown-scrollbar">
+                <div className="sticky top-0 z-10 px-3.5 py-2 bg-[#090C14]/95 backdrop-blur-md border-b border-white/10 flex items-center justify-between text-[11px] font-mono text-cyan-400 font-bold">
+                  <span>🏁 {destSuggestions.length} Bengaluru Locations</span>
+                  <span className="text-[10px] text-slate-400 font-normal">Scroll to explore</span>
+                </div>
                 {destSuggestions.map((place) => (
                   <button
                     key={place.id}
                     type="button"
-                    onClick={() => {
-                      setDestText(place.name);
-                      setDestCoords(place.coords);
-                      setIsDestOpen(false);
-                    }}
-                    className="w-full px-3.5 py-2.5 text-left flex items-center justify-between hover:bg-cyan-500/10 transition-colors"
+                    onClick={() => handleSelectDest(place)}
+                    className="w-full px-3.5 py-2.5 text-left flex items-center justify-between hover:bg-cyan-500/10 transition-colors group"
                   >
-                    <div className="flex items-center space-x-2.5">
-                      <Flag className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
-                      <span className="text-xs font-semibold text-slate-200">{place.name}</span>
+                    <div className="flex items-center space-x-2.5 truncate">
+                      <Flag className="w-3.5 h-3.5 text-cyan-400 shrink-0 group-hover:scale-110 transition-transform" />
+                      <span className="text-xs font-semibold text-slate-200 truncate group-hover:text-white">{place.name}</span>
                     </div>
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-white/[0.06] text-slate-400">
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-white/[0.06] text-slate-400 shrink-0 ml-2">
                       {place.category}
                     </span>
                   </button>
