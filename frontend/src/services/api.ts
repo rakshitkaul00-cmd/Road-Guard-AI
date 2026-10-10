@@ -175,5 +175,23 @@ export const api = {
       throw new Error("Invalid credentials");
     }
     return res.json();
+  },
+
+  async simulateRisk(payload: {
+    road_class: string;
+    speed_limit_kmh: number;
+    lane_count: number;
+    dist_nearest_junction_m: number;
+    is_night: number;
+    precipitation_active: number;
+    is_peak_hour: number;
+    is_blackspot_corridor: number;
+  }) {
+    const res = await fetch(`${API_BASE}/segments/simulate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    return res.json();
   }
 };

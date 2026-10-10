@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import L from 'leaflet';
 import { 
   Shield, Navigation, AlertTriangle, CheckCircle, Clock, ArrowRight, 
-  Info, Sparkles, MapPin, Gauge, Award, Compass, Zap, Check, ChevronRight
+  Info, Sparkles, MapPin, Gauge, Award, Compass, Zap, Check, ChevronRight,
+  Eye, Flag
 } from 'lucide-react';
 import { api, RouteEvaluationResponse } from '../services/api';
 
@@ -9,6 +11,12 @@ export const RouteComparison: React.FC = () => {
   const [selectedPreset, setSelectedPreset] = useState('hebbal_to_silkboard');
   const [loading, setLoading] = useState(false);
   const [evaluationResult, setEvaluationResult] = useState<RouteEvaluationResponse | null>(null);
+  const [activeRouteId, setActiveRouteId] = useState<string>('route_collector_secondary');
+
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+  const mapInstanceRef = useRef<L.Map | null>(null);
+  const routeLayersRef = useRef<{ [key: string]: L.Polyline }>({});
+  const markerGroupRef = useRef<L.LayerGroup>(L.layerGroup());
 
   const presets = [
     {
@@ -43,6 +51,8 @@ export const RouteComparison: React.FC = () => {
     try {
       const res = await api.evaluateRoute(chosen.origin, chosen.destination);
       setEvaluationResult(res);
+      // Default to the safer route
+      setActiveRouteId('route_collector_secondary');
     } catch (e) {
       console.error("Failed to evaluate route", e);
     } finally {
@@ -50,9 +60,127 @@ export const RouteComparison: React.FC = () => {
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     handleEvaluate('hebbal_to_silkboard');
   }, []);
+
+  // Initialize Route Visualizer Leaflet Map
+  useEffect(() => {
+    if (!mapContainerRef.current || mapInstanceRef.current) return;
+
+    const map = L.map(mapContainerRef.current, {
+      center: [12.9716, 77.5946],
+      zoom: 12,
+      zoomControl: false,
+      attributionControl: false
+    });
+
+    L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+    // Midnight dark map tiles
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 18
+    }).addTo(map);
+
+    markerGroupRef.current.addTo(map);
+    mapInstanceRef.current = map;
+
+    return () => {
+      map.remove();
+      mapInstanceRef.current = null;
+    };
+  }, []);
+
+  // Plot routes and waypoints when evaluationResult changes
+  useEffect(() => {
+    if (!mapInstanceRef.current || !evaluationResult) return;
+    const map = mapInstanceRef.current;
+
+    // Clear previous routes
+    Object.values(routeLayersRef.current).forEach(layer => map.removeLayer(layer));
+    routeLayersRef.current = {};
+    markerGroupRef.current.clearLayers();
+
+    const [origLat, origLon] = evaluationResult.origin;
+    const [destLat, destLon] = evaluationResult.destination;
+
+    // Origin Marker
+    const originIcon = L.divIcon({
+      className: 'route-origin-pin',
+      html: `
+        <div class="flex items-center justify-center w-7 h-7 rounded-full bg-emerald-500 border-2 border-white shadow-xl text-slate-950 font-black text-xs">
+          A
+        </div>
+      `,
+      iconSize: [28, 28],
+      iconAnchor: [14, 14]
+    });
+    L.marker([origLat, origLon], { icon: originIcon })
+      .bindPopup("<strong>Trip Origin:</strong> " + presets.find(p => p.id === selectedPreset)?.title.split('→')[0])
+      .addTo(markerGroupRef.current);
+
+    // Destination Marker
+    const destIcon = L.divIcon({
+      className: 'route-dest-pin',
+      html: `
+        <div class="flex items-center justify-center w-7 h-7 rounded-full bg-cyan-400 border-2 border-white shadow-xl text-slate-950 font-black text-xs">
+          B
+        </div>
+      `,
+      iconSize: [28, 28],
+      iconAnchor: [14, 14]
+    });
+    L.marker([destLat, destLon], { icon: destIcon })
+      .bindPopup("<strong>Trip Destination:</strong> " + presets.find(p => p.id === selectedPreset)?.title.split('→')[1])
+      .addTo(markerGroupRef.current);
+
+    // Draw Route Polylines
+    const allCoords: [number, number][] = [];
+
+    evaluationResult.routes.forEach(route => {
+      const isSafer = route.safety_tier === 'LOWER_EXPOSURE';
+      const color = isSafer ? '#00F59B' : '#FFB800';
+      const coords = route.waypoints as [number, number][];
+
+      coords.forEach(c => allCoords.push(c));
+
+      const polyline = L.polyline(coords, {
+        color: color,
+        weight: route.route_id === activeRouteId ? 6 : 4,
+        opacity: route.route_id === activeRouteId ? 0.95 : 0.6,
+        dashArray: isSafer ? undefined : '6, 6'
+      }).addTo(map);
+
+      polyline.bindTooltip(
+        `<div class="text-xs font-bold">${route.route_name.split(':')[0]}: ${route.estimated_time_mins} mins • Exposure ${route.cumulative_risk_exposure}</div>`,
+        { sticky: true }
+      );
+
+      polyline.on('click', () => {
+        setActiveRouteId(route.route_id);
+      });
+
+      routeLayersRef.current[route.route_id] = polyline;
+    });
+
+    if (allCoords.length > 0) {
+      map.fitBounds(L.latLngBounds(allCoords), { padding: [40, 40] });
+    }
+  }, [evaluationResult, activeRouteId]);
+
+  // Update line weight when activeRouteId changes
+  useEffect(() => {
+    Object.entries(routeLayersRef.current).forEach(([id, polyline]) => {
+      const isActive = id === activeRouteId;
+      polyline.setStyle({
+        weight: isActive ? 6.5 : 3.5,
+        opacity: isActive ? 0.95 : 0.45
+      });
+      if (isActive) {
+        polyline.bringToFront();
+      }
+    });
+  }, [activeRouteId]);
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 space-y-6 font-sans">
@@ -65,7 +193,7 @@ export const RouteComparison: React.FC = () => {
         <h2 className="font-display font-black text-2xl md:text-3xl text-white tracking-tight">
           Multi-Route Risk Exposure Comparison
         </h2>
-        <p className="text-slate-400 text-xs md:text-sm max-w-3xl leading-relaxed">
+        <p className="text-slate-400 text-xs md:text-sm max-w-3xl leading-relaxed font-light">
           Traditional navigation systems prioritize strictly for travel time or shortest distance, routinely funneling commuters through fatal collision clusters. RoadGuard AI calculates candidate transit corridors by integrating empirical BTP blackspot crossings with active crowdsourced hazard density.
         </p>
       </div>
@@ -96,6 +224,30 @@ export const RouteComparison: React.FC = () => {
         </div>
       </div>
 
+      {/* Interactive GIS Route Visualizer Map */}
+      <div className="glass-card-elevated rounded-3xl p-4 space-y-3">
+        <div className="flex items-center justify-between px-2">
+          <div className="flex items-center space-x-2">
+            <Compass className="w-4 h-4 text-cyan-400" />
+            <span className="font-display font-bold text-white text-sm">Geospatial Transit Corridor Map</span>
+          </div>
+          <div className="flex items-center space-x-4 text-xs font-mono">
+            <span className="flex items-center gap-1.5 text-emerald-400">
+              <span className="w-3.5 h-1.5 rounded-full bg-[#00F59B]"></span>
+              Route 2 (Safer Bypass)
+            </span>
+            <span className="flex items-center gap-1.5 text-amber-400">
+              <span className="w-3.5 h-1.5 rounded-full bg-[#FFB800]"></span>
+              Route 1 (Arterial Arterial)
+            </span>
+          </div>
+        </div>
+
+        <div className="relative w-full h-80 md:h-96 rounded-2xl overflow-hidden border border-white/10 map-theme-dark">
+          <div ref={mapContainerRef} className="w-full h-full" />
+        </div>
+      </div>
+
       {/* Route Evaluation Display */}
       {loading && (
         <div className="py-24 text-center space-y-3 text-slate-400 font-mono text-xs">
@@ -110,12 +262,16 @@ export const RouteComparison: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {evaluationResult.routes.map((route, idx) => {
               const isLowerRisk = route.safety_tier === 'LOWER_EXPOSURE';
+              const isSelected = route.route_id === activeRouteId;
               return (
                 <div
                   key={route.route_id}
-                  className={`glass-card rounded-3xl p-6 shadow-2xl flex flex-col justify-between space-y-5 transition-all duration-300 relative overflow-hidden ${
-                    isLowerRisk
-                      ? 'border-emerald-500/40 shadow-emerald-500/10 ring-1 ring-emerald-500/20'
+                  onClick={() => setActiveRouteId(route.route_id)}
+                  className={`glass-card rounded-3xl p-6 shadow-2xl flex flex-col justify-between space-y-5 transition-all duration-300 relative overflow-hidden cursor-pointer ${
+                    isSelected
+                      ? 'border-cyan-400 ring-2 ring-cyan-500/30 bg-white/[0.02]'
+                      : isLowerRisk
+                      ? 'border-emerald-500/40 shadow-emerald-500/10'
                       : 'border-white/[0.08]'
                   }`}
                 >
@@ -129,7 +285,9 @@ export const RouteComparison: React.FC = () => {
                       }`}>
                         {isLowerRisk ? '★ RECOMMENDED SAFER ROUTE' : 'STANDARD FASTEST ROUTE'}
                       </span>
-                      <span className="text-[11px] font-mono text-slate-500">OPTION #{idx + 1}</span>
+                      <span className="text-[11px] font-mono text-slate-500">
+                        {isSelected ? '● SELECTED ON MAP' : `OPTION #${idx + 1}`}
+                      </span>
                     </div>
 
                     <h3 className="font-display font-black text-lg text-white">{route.route_name}</h3>

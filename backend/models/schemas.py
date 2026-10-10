@@ -85,3 +85,13 @@ class TokenResponse(BaseModel):
     role: str
     email: str
     full_name: str
+
+class SegmentSimulationRequest(BaseModel):
+    road_class: str = "primary"
+    speed_limit_kmh: int = 50
+    lane_count: int = 4
+    dist_nearest_junction_m: float = 120.0
+    is_night: int = 1
+    precipitation_active: int = 0
+    is_peak_hour: int = 1
+    is_blackspot_corridor: int = 0

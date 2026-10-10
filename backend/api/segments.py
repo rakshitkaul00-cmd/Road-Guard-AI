@@ -4,7 +4,7 @@ import sqlite3
 import math
 
 from backend.database import get_db
-from backend.models.schemas import SegmentRiskCard
+from backend.models.schemas import SegmentRiskCard, SegmentSimulationRequest
 from backend.ml.inference import inference_engine
 
 router = APIRouter(prefix="/segments", tags=["Road Segment Risk Intelligence"])
@@ -94,3 +94,28 @@ def get_segment_risk_card(
         data_confidence=eval_res["data_confidence"],
         recommended_action=eval_res["recommended_action"]
     )
+
+@router.post("/simulate")
+def simulate_segment_risk(payload: SegmentSimulationRequest):
+    """
+    Real-time in-memory what-if inference sandbox for vivas and sensitivity audits.
+    """
+    eval_res = inference_engine.evaluate_segment(
+        {
+            "road_class": payload.road_class,
+            "speed_limit_kmh": payload.speed_limit_kmh,
+            "lane_count": payload.lane_count,
+            "dist_nearest_junction_m": payload.dist_nearest_junction_m,
+            "is_blackspot_corridor": payload.is_blackspot_corridor
+        },
+        is_night=payload.is_night,
+        precipitation=payload.precipitation_active,
+        is_peak=payload.is_peak_hour
+    )
+    return {
+        "calibrated_risk_probability": eval_res["calibrated_risk_probability"],
+        "risk_tier": eval_res["risk_tier"],
+        "shap_top_factors": eval_res["shap_top_factors"],
+        "data_confidence": eval_res["data_confidence"],
+        "recommended_action": eval_res["recommended_action"]
+    }

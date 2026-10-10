@@ -117,3 +117,22 @@ def test_government_ogd_portal():
     d = res.json()
     assert "portal_name" in d
     assert "data.gov.in" in d["portal_url"]
+
+def test_simulate_segment_risk():
+    payload = {
+        "road_class": "primary",
+        "speed_limit_kmh": 60,
+        "lane_count": 4,
+        "dist_nearest_junction_m": 120.0,
+        "is_night": 1,
+        "precipitation_active": 1,
+        "is_peak_hour": 1,
+        "is_blackspot_corridor": 1
+    }
+    res = client.post("/api/v1/segments/simulate", json=payload)
+    assert res.status_code == 200
+    d = res.json()
+    assert "calibrated_risk_probability" in d
+    assert "risk_tier" in d
+    assert "shap_top_factors" in d
+    assert d["calibrated_risk_probability"] > 0.4

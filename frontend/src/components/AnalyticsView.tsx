@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { 
   BarChart3, TrendingUp, AlertTriangle, ShieldAlert, Award, FileText, 
-  CheckCircle2, Globe, Key, ExternalLink, Activity, ArrowUpRight
+  CheckCircle2, Globe, Key, ExternalLink, Activity, ArrowUpRight,
+  Sliders, Gauge, Moon, Sun, CloudRain, Sparkles, RefreshCw
 } from 'lucide-react';
 import { api } from '../services/api';
 
@@ -11,6 +12,22 @@ export const AnalyticsView: React.FC = () => {
   const [ogdInfo, setOgdInfo] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
+  // Live What-If ML Simulator State
+  const [simParams, setSimParams] = useState({
+    road_class: 'primary',
+    speed_limit_kmh: 60,
+    lane_count: 4,
+    dist_nearest_junction_m: 100,
+    is_night: 1,
+    precipitation_active: 0,
+    is_peak_hour: 1,
+    is_blackspot_corridor: 0
+  });
+
+  const [simResult, setSimResult] = useState<any>(null);
+  const [simulating, setSimulating] = useState(false);
+
+  // Fetch initial data
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -31,6 +48,27 @@ export const AnalyticsView: React.FC = () => {
     };
     fetchData();
   }, []);
+
+  // Run What-If simulation
+  const runSimulation = async () => {
+    setSimulating(true);
+    try {
+      const res = await api.simulateRisk(simParams);
+      setSimResult(res);
+    } catch (e) {
+      console.error("Simulation error", e);
+    } finally {
+      setSimulating(false);
+    }
+  };
+
+  useEffect(() => {
+    runSimulation();
+  }, [simParams]);
+
+  const simRiskPercent = simResult ? Math.round(simResult.calibrated_risk_probability * 100) : 0;
+  const isSimHigh = simResult?.risk_tier === 'ELEVATED';
+  const isSimModerate = simResult?.risk_tier === 'MODERATE';
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 space-y-8 font-sans">
@@ -85,6 +123,244 @@ export const AnalyticsView: React.FC = () => {
               </div>
             </div>
           )}
+
+          {/* Interactive Live ML What-If Simulator & SHAP Attribution Playground */}
+          <div className="glass-card-elevated rounded-3xl p-6 md:p-8 space-y-6 shadow-2xl border border-cyan-500/30">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-white/[0.08] pb-4">
+              <div>
+                <div className="flex items-center space-x-2 text-cyan-400 text-xs font-mono font-bold uppercase tracking-wider mb-1">
+                  <Sliders className="w-4 h-4 text-cyan-400" />
+                  <span>Real-Time Model Inference Playground</span>
+                </div>
+                <h3 className="font-display font-black text-xl md:text-2xl text-white">
+                  Interactive ML Risk &amp; SHAP What-If Simulator
+                </h3>
+                <p className="text-xs text-slate-400 font-light mt-0.5">
+                  Adjust roadway geometry, speed limits, and environmental conditions to witness sub-5ms Platt-calibrated inference and marginal SHAP waterfall recalculations live.
+                </p>
+              </div>
+              <div className="flex items-center space-x-2 text-xs font-mono bg-white/[0.06] px-3 py-1.5 rounded-xl border border-white/10 self-start md:self-auto">
+                <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+                <span className="text-cyan-300">In-Memory Engine Active</span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              {/* Controls (7 Cols) */}
+              <div className="lg:col-span-7 space-y-4 text-xs">
+                {/* Road Class & Blackspot Overlap */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <label className="block text-slate-300 font-semibold text-xs">
+                      Road Infrastructure Class:
+                    </label>
+                    <select
+                      value={simParams.road_class}
+                      onChange={(e) => setSimParams({ ...simParams, road_class: e.target.value })}
+                      className="w-full bg-[#08090D] border border-white/10 rounded-xl p-2.5 text-slate-200 text-xs focus:outline-none focus:border-cyan-500"
+                    >
+                      <option value="motorway">Motorway / Elevated Expressway</option>
+                      <option value="trunk">Trunk Road (NH-44 / Outer Ring Road)</option>
+                      <option value="primary">Primary Arterial (Indiranagar 100ft)</option>
+                      <option value="secondary">Secondary Collector (Sub-arterial)</option>
+                      <option value="residential">Residential Road (Neighborhood)</option>
+                    </select>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="block text-slate-300 font-semibold text-xs">
+                      BTP Blackspot Overlap:
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setSimParams({ ...simParams, is_blackspot_corridor: simParams.is_blackspot_corridor ? 0 : 1 })}
+                      className={`w-full p-2.5 rounded-xl border text-left font-semibold text-xs transition-all flex items-center justify-between ${
+                        simParams.is_blackspot_corridor
+                          ? 'bg-rose-950/40 border-rose-500/50 text-rose-300 shadow-md shadow-rose-500/10'
+                          : 'bg-[#08090D] border-white/10 text-slate-400 hover:text-white'
+                      }`}
+                    >
+                      <span>{simParams.is_blackspot_corridor ? 'Within 500m of BTP Blackspot' : 'No Chronic Blackspot Overlap'}</span>
+                      <span className="font-mono text-[10px]">{simParams.is_blackspot_corridor ? '+28%' : '0%'}</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Speed Limit Slider */}
+                <div className="bg-[#08090D] p-3 rounded-2xl border border-white/[0.06] space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-300 font-semibold">Speed Limit:</span>
+                    <span className="font-display font-black text-cyan-400 text-sm">{simParams.speed_limit_kmh} km/h</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="20"
+                    max="100"
+                    step="5"
+                    value={simParams.speed_limit_kmh}
+                    onChange={(e) => setSimParams({ ...simParams, speed_limit_kmh: parseInt(e.target.value) })}
+                    className="w-full accent-cyan-400 cursor-pointer"
+                  />
+                  <div className="flex justify-between text-[10px] font-mono text-slate-500">
+                    <span>20 km/h (Slow)</span>
+                    <span>50 km/h (Urban Default)</span>
+                    <span>100 km/h (Highway)</span>
+                  </div>
+                </div>
+
+                {/* Lane Count & Junction Distance */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="bg-[#08090D] p-3 rounded-2xl border border-white/[0.06] space-y-1.5">
+                    <div className="flex justify-between items-center">
+                      <span className="text-slate-300 font-semibold">Number of Lanes:</span>
+                      <span className="font-display font-black text-white text-xs">{simParams.lane_count} Lanes</span>
+                    </div>
+                    <div className="flex gap-1.5 pt-1">
+                      {[1, 2, 4, 6, 8].map((l) => (
+                        <button
+                          key={l}
+                          type="button"
+                          onClick={() => setSimParams({ ...simParams, lane_count: l })}
+                          className={`flex-1 py-1.5 rounded-lg border text-xs font-mono font-bold transition-all ${
+                            simParams.lane_count === l
+                              ? 'bg-cyan-500/20 border-cyan-500/50 text-cyan-300'
+                              : 'bg-white/[0.03] border-white/10 text-slate-400 hover:text-white'
+                          }`}
+                        >
+                          {l}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="bg-[#08090D] p-3 rounded-2xl border border-white/[0.06] space-y-1.5">
+                    <div className="flex justify-between items-center">
+                      <span className="text-slate-300 font-semibold">Nearest Junction:</span>
+                      <span className="font-display font-black text-white text-xs">{simParams.dist_nearest_junction_m}m</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="20"
+                      max="400"
+                      step="20"
+                      value={simParams.dist_nearest_junction_m}
+                      onChange={(e) => setSimParams({ ...simParams, dist_nearest_junction_m: parseInt(e.target.value) })}
+                      className="w-full accent-cyan-400 cursor-pointer pt-1"
+                    />
+                    <div className="flex justify-between text-[10px] font-mono text-slate-500">
+                      <span>20m (Convergence)</span>
+                      <span>400m (Straight)</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Environmental Context Toggles */}
+                <div className="grid grid-cols-3 gap-2 pt-1">
+                  <button
+                    type="button"
+                    onClick={() => setSimParams({ ...simParams, is_night: simParams.is_night ? 0 : 1 })}
+                    className={`p-2.5 rounded-xl border text-center transition-all ${
+                      simParams.is_night
+                        ? 'bg-indigo-950/40 border-indigo-500/50 text-indigo-200'
+                        : 'bg-[#08090D] border-white/10 text-slate-400'
+                    }`}
+                  >
+                    <span className="block font-semibold">{simParams.is_night ? '🌙 Night (19-06h)' : '☀️ Daylight'}</span>
+                    <span className="text-[10px] text-slate-500">{simParams.is_night ? '+12% Risk' : 'Baseline'}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setSimParams({ ...simParams, precipitation_active: simParams.precipitation_active ? 0 : 1 })}
+                    className={`p-2.5 rounded-xl border text-center transition-all ${
+                      simParams.precipitation_active
+                        ? 'bg-cyan-950/40 border-cyan-500/50 text-cyan-200'
+                        : 'bg-[#08090D] border-white/10 text-slate-400'
+                    }`}
+                  >
+                    <span className="block font-semibold">{simParams.precipitation_active ? '🌧️ Rain Active' : 'Dry Surface'}</span>
+                    <span className="text-[10px] text-slate-500">{simParams.precipitation_active ? '+14% Wet' : 'Optimal'}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setSimParams({ ...simParams, is_peak_hour: simParams.is_peak_hour ? 0 : 1 })}
+                    className={`p-2.5 rounded-xl border text-center transition-all ${
+                      simParams.is_peak_hour
+                        ? 'bg-amber-950/40 border-amber-500/50 text-amber-200'
+                        : 'bg-[#08090D] border-white/10 text-slate-400'
+                    }`}
+                  >
+                    <span className="block font-semibold">{simParams.is_peak_hour ? '🚦 Rush Hour' : 'Off-Peak'}</span>
+                    <span className="text-[10px] text-slate-500">{simParams.is_peak_hour ? 'Congested' : 'Free-flow'}</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Live Inference Output (5 Cols) */}
+              <div className="lg:col-span-5 flex flex-col justify-between space-y-4 bg-[#08090D] p-5 rounded-2xl border border-white/[0.08]">
+                {simResult && (
+                  <>
+                    <div>
+                      <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
+                        <div>
+                          <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block">
+                            Simulated Risk Outcome
+                          </span>
+                          <span className={`text-[10px] font-mono font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider mt-1 inline-block ${
+                            isSimHigh
+                              ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
+                              : isSimModerate
+                              ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
+                              : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                          }`}>
+                            {simResult.risk_tier} REGIME
+                          </span>
+                        </div>
+                        <span className="font-display font-black text-3xl text-white">
+                          {simRiskPercent}%
+                        </span>
+                      </div>
+
+                      {/* Probability Meter */}
+                      <div className="mt-3 w-full bg-[#1A1E2B] rounded-full h-2 overflow-hidden">
+                        <div
+                          className={`h-full rounded-full transition-all duration-500 ${
+                            isSimHigh ? 'bg-gradient-to-r from-rose-500 to-red-600' : isSimModerate ? 'bg-gradient-to-r from-amber-500 to-yellow-500' : 'bg-gradient-to-r from-emerald-500 to-teal-400'
+                          }`}
+                          style={{ width: `${simRiskPercent}%` }}
+                        />
+                      </div>
+
+                      {/* SHAP Factors */}
+                      <div className="mt-4 space-y-2">
+                        <span className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider block">
+                          Top Dynamic SHAP Attributions:
+                        </span>
+                        {simResult.shap_top_factors.map((f: any, i: number) => (
+                          <div key={i} className="flex items-center justify-between p-2 rounded-xl bg-white/[0.03] border border-white/[0.06] text-xs">
+                            <span className="text-slate-300 font-medium truncate max-w-[200px]">{f.feature}</span>
+                            <span className={`font-mono font-bold ${f.direction === 'increases_risk' ? 'text-rose-400' : 'text-emerald-400'}`}>
+                              {f.direction === 'increases_risk' ? '+' : '-'}{f.impact_percentage}%
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="pt-3 border-t border-white/[0.08] text-xs">
+                      <span className="text-[10px] font-mono font-bold text-cyan-400 uppercase tracking-wider block mb-1">
+                        Recommended Engineering Countermeasure:
+                      </span>
+                      <p className="text-slate-300 text-xs font-light leading-relaxed">
+                        {simResult.recommended_action}
+                      </p>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
 
           {/* Official Government Open Data (data.gov.in) Card */}
           {ogdInfo && (
