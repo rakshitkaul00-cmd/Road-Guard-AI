@@ -1,12 +1,12 @@
 import React from 'react';
 import { 
   Shield, MapPin, AlertTriangle, BarChart3, CheckSquare, PhoneCall, 
-  Info, UserCheck, Navigation, Radio, Sparkles, Activity
+  Info, Key, Navigation, UserCheck
 } from 'lucide-react';
 
 interface NavbarProps {
-  currentTab: 'map' | 'routes' | 'analytics' | 'admin' | 'overview';
-  setCurrentTab: (tab: 'map' | 'routes' | 'analytics' | 'admin' | 'overview') => void;
+  currentTab: 'map' | 'routes' | 'analytics' | 'admin' | 'overview' | 'login';
+  setCurrentTab: (tab: 'map' | 'routes' | 'analytics' | 'admin' | 'overview' | 'login') => void;
   openReportModal: () => void;
   openEmergencyDrawer: () => void;
   userRole: 'CITIZEN' | 'MODERATOR' | 'ADMIN';
@@ -25,43 +25,14 @@ export const Navbar: React.FC<NavbarProps> = ({
   authToken,
   setAuthToken
 }) => {
-  const handleRoleChange = async (newRole: 'CITIZEN' | 'MODERATOR' | 'ADMIN') => {
-    setUserRole(newRole);
-    if (newRole === 'ADMIN') {
-      try {
-        const res = await fetch('/api/v1/auth/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: 'admin@roadguard.ai', password: 'Admin@RoadGuard2026' })
-        });
-        const d = await res.json();
-        setAuthToken(d.access_token);
-      } catch (e) {
-        console.error(e);
-      }
-    } else if (newRole === 'MODERATOR') {
-      try {
-        const res = await fetch('/api/v1/auth/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: 'moderator@roadguard.ai', password: 'Moderator@RoadGuard2026' })
-        });
-        const d = await res.json();
-        setAuthToken(d.access_token);
-      } catch (e) {
-        console.error(e);
-      }
-    } else {
-      setAuthToken('');
-    }
-  };
+  const isLoggedIn = !!authToken && userRole !== 'CITIZEN';
 
   const navItems = [
     { id: 'map', label: 'Safety Radar', icon: MapPin },
     { id: 'routes', label: 'Route Exposure', icon: Navigation },
     { id: 'analytics', label: 'ML Attribution', icon: BarChart3 },
     { id: 'admin', label: 'Municipal Queue', icon: CheckSquare },
-    { id: 'overview', label: 'Research Blueprint', icon: Info },
+    { id: 'overview', label: 'Blueprint', icon: Info },
   ] as const;
 
   return (
@@ -87,7 +58,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 RoadGuard<span className="text-cyan-400">.ai</span>
               </span>
               <span className="px-2 py-0.5 rounded-md text-[10px] font-mono font-semibold bg-white/[0.06] text-cyan-300 border border-white/[0.08]">
-                BBMP URBAN
+                BTP URBAN
               </span>
             </div>
             <p className="text-[11px] text-slate-400 font-normal tracking-wide hidden sm:block">
@@ -120,42 +91,35 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         {/* Tactical Controls & Actions */}
         <div className="flex items-center space-x-2.5">
-          {/* Segmented Persona / Role Control */}
-          <div className="flex items-center bg-[#12151E] border border-white/[0.08] rounded-xl p-1 text-[11px]">
-            <span className="text-slate-500 px-2 font-mono text-[10px] uppercase tracking-wider hidden lg:inline">
-              Role:
-            </span>
+          {/* Officer Portal / Login Button */}
+          {isLoggedIn ? (
             <button
-              onClick={() => handleRoleChange('CITIZEN')}
-              className={`px-2.5 py-1 rounded-lg transition-all font-medium ${
-                userRole === 'CITIZEN' 
-                  ? 'bg-white/[0.12] text-white shadow-sm font-semibold' 
-                  : 'text-slate-400 hover:text-slate-200'
+              onClick={() => setCurrentTab('login')}
+              className={`flex items-center space-x-2 px-3 py-1.5 rounded-xl border transition-all text-xs font-semibold ${
+                currentTab === 'login'
+                  ? 'bg-cyan-500/20 border-cyan-400 text-cyan-300 shadow-md shadow-cyan-500/20'
+                  : 'bg-emerald-500/10 hover:bg-emerald-500/20 border-emerald-500/30 text-emerald-300'
+              }`}
+              title="View Authenticated Officer Profile"
+            >
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span className="font-mono text-[11px]">
+                {userRole === 'ADMIN' ? '👮 BTP Admin' : '🔍 BBMP Inspector'}
+              </span>
+            </button>
+          ) : (
+            <button
+              onClick={() => setCurrentTab('login')}
+              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all duration-200 border ${
+                currentTab === 'login'
+                  ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white border-cyan-400 shadow-md shadow-cyan-500/25'
+                  : 'bg-white/[0.06] hover:bg-white/[0.12] text-slate-200 border-white/[0.1]'
               }`}
             >
-              Citizen
+              <Key className="w-3.5 h-3.5 text-cyan-400" />
+              <span>Officer Portal</span>
             </button>
-            <button
-              onClick={() => handleRoleChange('MODERATOR')}
-              className={`px-2.5 py-1 rounded-lg transition-all font-medium ${
-                userRole === 'MODERATOR' 
-                  ? 'bg-amber-500/20 text-amber-300 font-semibold border border-amber-500/30' 
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              Inspector
-            </button>
-            <button
-              onClick={() => handleRoleChange('ADMIN')}
-              className={`px-2.5 py-1 rounded-lg transition-all font-medium ${
-                userRole === 'ADMIN' 
-                  ? 'bg-purple-500/20 text-purple-300 font-semibold border border-purple-500/30' 
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              Admin
-            </button>
-          </div>
+          )}
 
           {/* Primary Action Button: + Report Hazard */}
           <button

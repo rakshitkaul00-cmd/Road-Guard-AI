@@ -5,9 +5,10 @@ import { api, CitizenReport } from '../services/api';
 interface AdminQueueProps {
   userRole: 'CITIZEN' | 'MODERATOR' | 'ADMIN';
   authToken: string;
+  onOpenLogin?: () => void;
 }
 
-export const AdminQueue: React.FC<AdminQueueProps> = ({ userRole, authToken }) => {
+export const AdminQueue: React.FC<AdminQueueProps> = ({ userRole, authToken, onOpenLogin }) => {
   const [reports, setReports] = useState<CitizenReport[]>([]);
   const [statusFilter, setStatusFilter] = useState('PENDING_REVIEW');
   const [loading, setLoading] = useState(false);
@@ -97,11 +98,21 @@ export const AdminQueue: React.FC<AdminQueueProps> = ({ userRole, authToken }) =
 
       {/* Role Notice if Citizen */}
       {userRole === 'CITIZEN' && (
-        <div className="p-4 bg-amber-500/10 border border-amber-500/25 rounded-2xl text-amber-300 text-xs flex items-center space-x-3 shadow-lg">
-          <ShieldCheck className="w-5 h-5 flex-shrink-0 text-amber-400" />
-          <span className="font-light">
-            You are currently viewing in <strong className="text-white">Citizen Mode (Read-Only)</strong>. To test approving or rejecting reports during your review, switch to <strong className="text-amber-200">Inspector</strong> or <strong className="text-purple-200">Admin</strong> in the top navbar!
-          </span>
+        <div className="p-4 bg-amber-500/10 border border-amber-500/25 rounded-2xl text-amber-300 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-lg">
+          <div className="flex items-center space-x-3">
+            <ShieldCheck className="w-5 h-5 flex-shrink-0 text-amber-400" />
+            <span className="font-light">
+              You are currently viewing in <strong className="text-white">Citizen Mode (Read-Only)</strong>. Sign in as a BTP Police Officer or BBMP Inspector to approve, verify, or resolve hazard reports.
+            </span>
+          </div>
+          {onOpenLogin && (
+            <button
+              onClick={onOpenLogin}
+              className="px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs shrink-0 transition-all shadow-md self-start sm:self-auto"
+            >
+              Sign In as Officer →
+            </button>
+          )}
         </div>
       )}
 
