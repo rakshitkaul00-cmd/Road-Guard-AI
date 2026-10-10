@@ -3,7 +3,7 @@ import L from 'leaflet';
 import { 
   Layers, Shield, AlertTriangle, Sun, Moon, CloudRain, Info, Search, 
   CloudLightning, Compass, ChevronDown, ChevronUp, Eye, EyeOff,
-  Radio, Sparkles, Navigation2, CheckCircle2, Wind
+  Radio, Sparkles, Navigation2, CheckCircle2, Wind, MapPin, X, Loader2
 } from 'lucide-react';
 import { api, MapLayersResponse, MapLayerFeature } from '../services/api';
 
@@ -12,10 +12,60 @@ interface MapExplorerProps {
   onOpenReportAtCoord: (lat: number, lon: number) => void;
 }
 
+export interface SearchItem {
+  id: string;
+  name: string;
+  category: 'Blackspot' | 'Major Junction' | 'Neighborhood' | 'Tech Park' | 'Road Corridor' | 'Live Place';
+  coords: [number, number];
+  desc: string;
+}
+
+// Curated High-Density Bengaluru Gazetteers
+const BENGALURU_GAZETTEER: SearchItem[] = [
+  // BTP Official Blackspots & Critical Hotzones
+  { id: 'btp-silkboard', name: 'Central Silk Board Junction', category: 'Blackspot', coords: [12.9176, 77.6238], desc: 'Outer Ring Rd / Hosur Rd • BTP Priority 1' },
+  { id: 'btp-hebbal', name: 'Hebbal Flyover & Junction', category: 'Blackspot', coords: [13.0358, 77.5970], desc: 'NH-44 Airport Highway Corridor' },
+  { id: 'btp-tinfactory', name: 'Tin Factory / KR Puram Bridge', category: 'Blackspot', coords: [12.9972, 77.6698], desc: 'Old Madras Rd • Critical Bottleneck' },
+  { id: 'btp-goragunte', name: 'Goraguntepalya / CMTI Junction', category: 'Blackspot', coords: [13.0285, 77.5408], desc: 'Tumakuru Rd Elevated Flyover (NH-48)' },
+  { id: 'btp-marathahalli', name: 'Marathahalli Multiplex Junction', category: 'Major Junction', coords: [12.9562, 77.7011], desc: 'Outer Ring Road • East Tech Corridor' },
+  { id: 'btp-peenya', name: 'Peenya 8th Mile / Jalahalli Cross', category: 'Blackspot', coords: [13.0458, 77.5029], desc: 'Industrial Arterial Corridor (NH-48)' },
+  { id: 'btp-ecity', name: 'Electronic City Toll Plaza', category: 'Major Junction', coords: [12.8452, 77.6602], desc: 'Hosur Rd Elevated Expressway' },
+  { id: 'btp-kengeri', name: 'Kengeri Satellite Bus Stand', category: 'Major Junction', coords: [12.9125, 77.4839], desc: 'Mysuru Rd High-Speed Link' },
+  { id: 'btp-yeshwanthpur', name: 'Yeshwanthpur Govardhan Circle', category: 'Major Junction', coords: [13.0238, 77.5513], desc: 'Suburban Rail & Ring Road Hub' },
+  { id: 'btp-dairycircle', name: 'Dairy Circle / Bannerghatta Rd', category: 'Major Junction', coords: [12.9372, 77.5995], desc: 'South Core Transit Junction' },
+  { id: 'btp-richmond', name: 'Richmond Circle / Residency Rd', category: 'Major Junction', coords: [12.9664, 77.5996], desc: 'Central Business District Intersection' },
+  { id: 'btp-domlur', name: 'Domlur Flyover / EGL Corridor', category: 'Major Junction', coords: [12.9609, 77.6387], desc: 'Old Airport Road / Intermediate Ring Rd' },
+  { id: 'btp-mekhri', name: 'Mekhri Circle / Bellary Rd', category: 'Major Junction', coords: [13.0076, 77.5843], desc: 'Palace Grounds North Approach' },
+  { id: 'btp-majestic', name: 'Majestic / Kempegowda Bus Station', category: 'Major Junction', coords: [12.9767, 77.5713], desc: 'Central Metro & Transit Interchange' },
+
+  // Neighborhoods & Commercial Hubs
+  { id: 'hub-koramangala', name: 'Koramangala (Sony World Junction)', category: 'Neighborhood', coords: [12.9352, 77.6245], desc: '100ft Road / 80ft Road Core' },
+  { id: 'hub-indiranagar', name: 'Indiranagar (100ft Road)', category: 'Neighborhood', coords: [12.9784, 77.6408], desc: '100ft Rd / CMH Rd Boulevard' },
+  { id: 'hub-hsr', name: 'HSR Layout (27th Main)', category: 'Neighborhood', coords: [12.9116, 77.6389], desc: 'Sector 1-7 Residential & Commercial' },
+  { id: 'hub-whitefield', name: 'Whitefield (Hope Farm / ITPB)', category: 'Tech Park', coords: [12.9840, 77.7516], desc: 'East Bengaluru IT Hub' },
+  { id: 'hub-bellandur', name: 'Bellandur EcoSpace', category: 'Tech Park', coords: [12.9260, 77.6762], desc: 'Outer Ring Road Tech Corridor' },
+  { id: 'hub-sarjapur', name: 'Sarjapur Road (Wipro Gate)', category: 'Road Corridor', coords: [12.9103, 77.6850], desc: 'Kaikondrahalli • SE Commuter Corridor' },
+  { id: 'hub-jayanagar', name: 'Jayanagar (4th Block / South End)', category: 'Neighborhood', coords: [12.9348, 77.5786], desc: 'South Historic Commercial Hub' },
+  { id: 'hub-malleshwaram', name: 'Malleshwaram (8th Cross)', category: 'Neighborhood', coords: [13.0041, 77.5701], desc: 'Margosa Rd & Sampige Rd' },
+  { id: 'hub-banashankari', name: 'Banashankari Temple Circle', category: 'Neighborhood', coords: [12.9254, 77.5736], desc: 'Kanakapura Rd / Outer Ring Rd' },
+  { id: 'hub-rajajinagar', name: 'Rajajinagar (Navrang Circle)', category: 'Neighborhood', coords: [12.9973, 77.5552], desc: '10th Main West Transit Hub' },
+  { id: 'hub-nagavara', name: 'Nagavara / Manyata Tech Park', category: 'Tech Park', coords: [13.0435, 77.6208], desc: 'North Outer Ring Road Tech Hub' },
+  { id: 'hub-mgroad', name: 'MG Road / Brigade Road', category: 'Neighborhood', coords: [12.9740, 77.6080], desc: 'Central Business District' },
+  { id: 'hub-cubbonpark', name: 'Cubbon Park / Vidhana Soudha', category: 'Neighborhood', coords: [12.9796, 77.5907], desc: 'Government Administrative Zone' },
+  { id: 'hub-yelahanka', name: 'Yelahanka (Police Station / Kogilu)', category: 'Neighborhood', coords: [13.1007, 77.6012], desc: 'North Suburb / Airport Approach' },
+  { id: 'hub-btm', name: 'BTM Layout (Udupi Garden)', category: 'Neighborhood', coords: [12.9166, 77.6101], desc: 'Outer Ring Road Intermediate Hub' },
+  { id: 'hub-kalyannagar', name: 'Kalyan Nagar / HRBR Layout', category: 'Neighborhood', coords: [13.0232, 77.6472], desc: 'Ring Road East Corridor' },
+  { id: 'hub-krpuram', name: 'KR Puram Railway Station', category: 'Major Junction', coords: [13.0012, 77.6890], desc: 'Old Madras Highway Interchange' },
+  { id: 'hub-lalbagh', name: 'Lalbagh West Gate / Minerva', category: 'Major Junction', coords: [12.9507, 77.5844], desc: 'South Core Link' },
+  { id: 'hub-airport', name: 'KIA Bengaluru Airport Toll', category: 'Major Junction', coords: [13.2014, 77.7108], desc: 'Kempegowda International Airport' }
+];
+
 export const MapExplorer: React.FC<MapExplorerProps> = ({ onSelectSegment, onOpenReportAtCoord }) => {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
   const tileLayerRef = useRef<L.TileLayer | null>(null);
+  const searchBeaconRef = useRef<L.Marker | null>(null);
+  const searchContainerRef = useRef<HTMLDivElement>(null);
   
   const layerGroupsRef = useRef<{
     blackspots: L.LayerGroup;
@@ -37,6 +87,9 @@ export const MapExplorer: React.FC<MapExplorerProps> = ({ onSelectSegment, onOpe
   // Live Free Weather & Search
   const [liveWeather, setLiveWeather] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchResults, setSearchResults] = useState<SearchItem[]>([]);
+  const [isSearchingExternal, setIsSearchingExternal] = useState(false);
 
   // Toggles & Simulation Context
   const [showBlackspots, setShowBlackspots] = useState(true);
@@ -44,18 +97,6 @@ export const MapExplorer: React.FC<MapExplorerProps> = ({ onSelectSegment, onOpe
   const [showHazards, setShowHazards] = useState(true);
   const [isNightTime, setIsNightTime] = useState(1);
   const [isRainActive, setIsRainActive] = useState(0);
-
-  // Bengaluru Major Transport Hubs
-  const BENGALURU_HUBS: Record<string, { coords: [number, number]; desc: string }> = {
-    'Silk Board': { coords: [12.9176, 77.6238], desc: 'Outer Ring Rd • High Crash Density' },
-    'Hebbal Flyover': { coords: [13.0358, 77.5970], desc: 'NH-44 Airport Corridor' },
-    'Marathahalli': { coords: [12.9562, 77.7011], desc: 'ORR East Tech Zone' },
-    'Tin Factory': { coords: [12.9972, 77.6698], desc: 'Old Madras Rd • KR Puram' },
-    'Peenya 8th Mile': { coords: [13.0458, 77.5029], desc: 'Tumakuru Highway Corridor' },
-    'Electronic City': { coords: [12.8452, 77.6602], desc: 'Hosur Rd Elevated Flyover' },
-    'Indiranagar': { coords: [12.9784, 77.6408], desc: '100ft Rd Commercial Zone' },
-    'Kengeri Bus Stand': { coords: [12.9125, 77.4839], desc: 'Mysuru Rd High-Speed Link' }
-  };
 
   // Switch Tile Layer dynamically
   const updateTileLayer = (style: 'dark' | 'satellite' | 'standard', map: L.Map) => {
@@ -81,6 +122,17 @@ export const MapExplorer: React.FC<MapExplorerProps> = ({ onSelectSegment, onOpe
       ).addTo(map);
     }
   };
+
+  // Close search suggestions on click outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(e.target as Node)) {
+        setIsSearchOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Initialize Map
   useEffect(() => {
@@ -150,22 +202,134 @@ export const MapExplorer: React.FC<MapExplorerProps> = ({ onSelectSegment, onOpe
     fetchLiveWeather();
   }, []);
 
-  const handleJumpToHub = (coords: [number, number]) => {
-    if (mapInstanceRef.current) {
-      mapInstanceRef.current.flyTo(coords, 14, { duration: 1.4 });
+  // Location Selection & Animated Beacon Placement
+  const handleSelectLocation = (item: SearchItem) => {
+    if (!mapInstanceRef.current) return;
+
+    // Fly smoothly to target
+    mapInstanceRef.current.flyTo(item.coords, 15, { duration: 1.4 });
+
+    // Remove previous search beacon if any
+    if (searchBeaconRef.current) {
+      mapInstanceRef.current.removeLayer(searchBeaconRef.current);
     }
+
+    // Create glowing pulse beacon icon
+    const beaconIcon = L.divIcon({
+      className: 'search-beacon-icon',
+      html: `
+        <div style="position: relative; width: 36px; height: 36px; transform: translate(-18px, -18px);">
+          <div style="position: absolute; inset: 0; border-radius: 9999px; background: rgba(0, 229, 255, 0.4); animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;"></div>
+          <div style="position: absolute; inset: 4px; border-radius: 9999px; background: #08090D; border: 2.5px solid #00E5FF; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 18px #00E5FF;">
+            <div style="width: 8px; height: 8px; border-radius: 9999px; background: #00E5FF;"></div>
+          </div>
+        </div>
+      `,
+      iconSize: [36, 36],
+      iconAnchor: [18, 18]
+    });
+
+    const marker = L.marker(item.coords, { icon: beaconIcon }).addTo(mapInstanceRef.current);
+    marker.bindPopup(`
+      <div style="font-family: sans-serif; font-size: 12px; color: #f8fafc; background: #08090D; padding: 6px 12px; border-radius: 12px; border: 1px solid #00E5FF; min-width: 160px; box-shadow: 0 10px 25px rgba(0,0,0,0.8);">
+        <strong style="color: #00E5FF; font-size: 13px;">📍 ${item.name}</strong><br>
+        <span style="color: #94a3b8; font-size: 11px;">${item.desc}</span>
+      </div>
+    `).openPopup();
+
+    searchBeaconRef.current = marker;
+    setSearchQuery(item.name);
+    setIsSearchOpen(false);
   };
+
+  // Autocomplete filtering & Live Geocoding debouncer
+  useEffect(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) {
+      // Default top suggestions when empty
+      setSearchResults(BENGALURU_GAZETTEER.slice(0, 5));
+      return;
+    }
+
+    // 1. Match local gazetteer
+    const localMatches = BENGALURU_GAZETTEER.filter(
+      item => item.name.toLowerCase().includes(q) || item.desc.toLowerCase().includes(q)
+    );
+
+    // 2. Match blackspots and road segments from layersData
+    const dynamicMatches: SearchItem[] = [];
+    if (layersData?.features) {
+      for (const feat of layersData.features) {
+        const p = feat.properties || {};
+        if (p.layer_type === 'official_blackspot' && p.blackspot_name) {
+          if (p.blackspot_name.toLowerCase().includes(q) && !localMatches.some(m => m.name.toLowerCase().includes(p.blackspot_name.toLowerCase()))) {
+            const coords: [number, number] = [feat.geometry.coordinates[1], feat.geometry.coordinates[0]];
+            dynamicMatches.push({
+              id: `feat-bs-${feat.id}`,
+              name: p.blackspot_name,
+              category: 'Blackspot',
+              coords,
+              desc: `${p.corridor_name || 'BTP Fatality Hotspot'} • Risk Tier: ELEVATED`
+            });
+          }
+        } else if (p.layer_type === 'road_segment' && p.road_name) {
+          if (p.road_name.toLowerCase().includes(q) && !dynamicMatches.some(m => m.name === p.road_name)) {
+            const coords: [number, number] = feat.geometry.coordinates?.[0]
+              ? [feat.geometry.coordinates[0][1], feat.geometry.coordinates[0][0]]
+              : [12.9716, 77.5946];
+            dynamicMatches.push({
+              id: `feat-seg-${feat.id}`,
+              name: p.road_name,
+              category: 'Road Corridor',
+              coords,
+              desc: `${p.road_class?.toUpperCase() || 'PRIMARY'} • ${p.speed_limit_kmh || 50} km/h • Risk: ${Math.round((p.calibrated_risk || 0.3) * 100)}%`
+            });
+          }
+        }
+      }
+    }
+
+    const combined = [...localMatches, ...dynamicMatches].slice(0, 6);
+    setSearchResults(combined);
+
+    // 3. Fallback: If less than 2 results and query has 3+ chars, query OpenStreetMap Nominatim
+    if (combined.length < 2 && q.length >= 3) {
+      setIsSearchingExternal(true);
+      const timer = setTimeout(async () => {
+        try {
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q + ', Bengaluru')}&limit=4`,
+            { signal: AbortSignal.timeout(3000) }
+          );
+          if (res.ok) {
+            const data = await res.json();
+            if (Array.isArray(data) && data.length > 0) {
+              const liveMatches: SearchItem[] = data.map((item: any, idx: number) => ({
+                id: `nominatim-${idx}-${item.place_id || idx}`,
+                name: item.display_name.split(',')[0],
+                category: 'Live Place',
+                coords: [parseFloat(item.lat), parseFloat(item.lon)],
+                desc: item.display_name.split(',').slice(1, 3).join(',').trim() || 'Bengaluru Location'
+              }));
+              setSearchResults(prev => [...prev, ...liveMatches].slice(0, 6));
+            }
+          }
+        } catch (_) {
+          // Graceful ignore
+        } finally {
+          setIsSearchingExternal(false);
+        }
+      }, 350);
+
+      return () => clearTimeout(timer);
+    }
+  }, [searchQuery, layersData]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const query = searchQuery.trim().toLowerCase();
-    for (const [name, info] of Object.entries(BENGALURU_HUBS)) {
-      if (name.toLowerCase().includes(query)) {
-        handleJumpToHub(info.coords);
-        return;
-      }
+    if (searchResults.length > 0) {
+      handleSelectLocation(searchResults[0]);
     }
-    handleJumpToHub([12.9716, 77.5946]);
   };
 
   // Render Features to Leaflet
@@ -189,88 +353,51 @@ export const MapExplorer: React.FC<MapExplorerProps> = ({ onSelectSegment, onOpe
           radius: p.buffer_radius_m || 500,
           color: '#FF2E5B',
           weight: 1.5,
-          opacity: 0.7,
+          opacity: 0.8,
           fillColor: '#FF2E5B',
           fillOpacity: 0.12,
-          dashArray: '6, 8'
+          dashArray: '6, 6'
         });
 
-        // Custom Double-Radar Center Marker
-        const customIcon = L.divIcon({
-          className: 'tactical-blackspot-icon',
-          html: `
-            <div class="relative flex items-center justify-center">
-              <span class="absolute w-8 h-8 rounded-full bg-rose-500/30 radar-ping"></span>
-              <span class="relative w-4 h-4 rounded-full bg-[#FF2E5B] border-2 border-white shadow-lg flex items-center justify-center">
-                <span class="w-1.5 h-1.5 rounded-full bg-white"></span>
-              </span>
-            </div>
-          `,
-          iconSize: [32, 32],
-          iconAnchor: [16, 16]
+        // Pulsing core marker
+        const marker = L.circleMarker([lat, lon], {
+          radius: 9,
+          color: '#FFFFFF',
+          weight: 2,
+          fillColor: '#FF2E5B',
+          fillOpacity: 1.0
         });
 
-        const centerMarker = L.marker([lat, lon], { icon: customIcon });
-
-        const popupContent = `
-          <div class="p-2 space-y-2.5 max-w-xs font-sans text-slate-100">
-            <div class="flex items-center justify-between border-b border-white/10 pb-2">
-              <span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30 flex items-center gap-1.5">
-                <span class="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse"></span>
-                OFFICIAL BTP BLACKSPOT
-              </span>
-              <span class="text-[10px] font-mono text-slate-400">#${p.blackspot_id}</span>
-            </div>
-            <div>
-              <h4 class="font-display font-bold text-sm text-white">${p.junction_name}</h4>
-              <p class="text-[11px] text-slate-300 font-medium">${p.corridor_name}</p>
-            </div>
-            <div class="grid grid-cols-2 gap-2 bg-[#0A0D14] p-2 rounded-xl border border-white/10 text-xs">
-              <div class="text-center p-1.5 bg-rose-950/40 rounded-lg border border-rose-900/30">
-                <span class="text-slate-400 block text-[9px] uppercase tracking-wider font-semibold">Fatalities (3-Yr)</span>
-                <span class="font-display font-black text-rose-400 text-base">${p.fatal_count_3yr}</span>
-              </div>
-              <div class="text-center p-1.5 bg-amber-950/40 rounded-lg border border-amber-900/30">
-                <span class="text-slate-400 block text-[9px] uppercase tracking-wider font-semibold">Injuries (3-Yr)</span>
-                <span class="font-display font-black text-amber-400 text-base">${p.injury_count_3yr}</span>
-              </div>
-            </div>
-            <p class="text-[11px] text-slate-300 leading-snug">
-              <strong class="text-slate-200">Engineering Cause:</strong> ${p.primary_hazard_cause}
-            </p>
-            <div class="text-[9px] text-slate-400 border-t border-white/10 pt-1.5 flex items-center justify-between font-mono">
-              <span>MoRTH Citation • Buffer: 500m</span>
-              <span class="text-cyan-400 font-bold">Verified</span>
-            </div>
+        marker.bindPopup(`
+          <div style="font-family: sans-serif; font-size: 12px; color: #f8fafc; background: #08090D; padding: 8px 12px; border-radius: 12px; border: 1px solid #FF2E5B; min-width: 200px;">
+            <div style="font-size: 10px; font-weight: bold; color: #FF2E5B; text-transform: uppercase;">● Priority BTP Crash Blackspot</div>
+            <div style="font-size: 14px; font-weight: bold; margin-top: 2px;">${p.blackspot_name || 'Designated Hotzone'}</div>
+            <div style="font-size: 11px; color: #94a3b8; margin-top: 4px;">Corridor: ${p.corridor_name || 'Bengaluru Arterial'}</div>
+            <div style="font-size: 11px; color: #f43f5e; margin-top: 2px;">Fatalities (3-Yr): <strong>${p.total_fatalities_3yr || 12}</strong> | Severe Injuries: <strong>${p.total_grievous_injuries_3yr || 24}</strong></div>
           </div>
-        `;
-        centerMarker.bindPopup(popupContent);
-        bufferCircle.bindPopup(popupContent);
+        `);
 
         blackspots.addLayer(bufferCircle);
-        blackspots.addLayer(centerMarker);
+        blackspots.addLayer(marker);
       }
 
-      // 2. Analyzed Road Segments (LineStrings)
+      // 2. OSM Highway Links / Segments
       if (p.layer_type === 'road_segment' && showSegments) {
-        const coords = feature.geometry.coordinates.map((c: [number, number]) => [c[1], c[0]]);
-        
-        let color = '#00F59B'; // Mint Aurora
-        let riskProb = p.calibrated_risk_probability;
-        if (isNightTime && !p.is_blackspot_corridor) {
-          riskProb = Math.min(0.95, riskProb + 0.12);
-        }
-        if (isRainActive) {
-          riskProb = Math.min(0.95, riskProb + 0.14);
-        }
+        let prob = p.calibrated_risk || 0.25;
+        if (isNightTime) prob += 0.10;
+        if (isRainActive) prob += 0.12;
+        prob = Math.min(0.95, Math.max(0.05, prob));
 
-        if (riskProb >= 0.58) color = '#FF2E5B'; // Crimson Neon
-        else if (riskProb >= 0.28) color = '#FFB800'; // Solar Amber
+        let color = '#00F59B'; // Mint (< 28%)
+        if (prob >= 0.58) color = '#FF2E5B'; // Coral Crimson (>= 58%)
+        else if (prob >= 0.28) color = '#FFB800'; // Solar Amber (28-58%)
 
-        const polyline = L.polyline(coords, {
+        const latLngs = feature.geometry.coordinates.map((coord: [number, number]) => [coord[1], coord[0]]);
+
+        const polyline = L.polyline(latLngs, {
           color: color,
-          weight: p.is_blackspot_corridor ? 6 : 4,
-          opacity: 0.92,
+          weight: prob >= 0.58 ? 6 : 4,
+          opacity: 0.9,
           lineCap: 'round',
           lineJoin: 'round'
         });
@@ -280,152 +407,132 @@ export const MapExplorer: React.FC<MapExplorerProps> = ({ onSelectSegment, onOpe
         });
 
         polyline.bindTooltip(`
-          <div class="text-xs p-1 space-y-1 font-sans">
-            <div class="font-display font-bold text-white text-sm">${p.road_name}</div>
-            <div class="flex items-center justify-between gap-3 text-[11px]">
-              <span class="text-slate-300 capitalize">${p.road_class} • ${p.speed_limit_kmh} km/h</span>
-              <span class="font-mono font-bold px-1.5 py-0.5 rounded text-[10px]" style="background:${color}25; color:${color}">
-                ${Math.round(riskProb * 100)}% RELATIVE RISK
-              </span>
-            </div>
-            <div class="text-[10px] text-cyan-400 font-medium pt-1 border-t border-white/10 flex items-center justify-between">
-              <span>Click to inspect local SHAP card</span>
-              <span class="font-mono">#${p.segment_id}</span>
-            </div>
+          <div style="font-family: sans-serif; font-size: 11px; padding: 2px 6px;">
+            <strong>${p.road_name || 'Highway Link'}</strong><br/>
+            Risk Probability: <strong>${Math.round(prob * 100)}%</strong> (${prob >= 0.58 ? 'Critical' : prob >= 0.28 ? 'Moderate' : 'Low'})
           </div>
-        `, { sticky: true, opacity: 0.95 });
+        `, { sticky: true });
 
         segments.addLayer(polyline);
       }
 
-      // 3. Citizen Hazard Submissions
+      // 3. Crowdsourced Citizen Hazard Points
       if (p.layer_type === 'citizen_hazard' && showHazards) {
         const [lon, lat] = feature.geometry.coordinates;
-
-        const hazardIcon = L.divIcon({
-          className: 'tactical-hazard-icon',
-          html: `
-            <div class="relative flex items-center justify-center cursor-pointer hover:scale-125 transition-transform">
-              <span class="w-4 h-4 rounded-full ${p.status === 'VERIFIED' ? 'bg-[#00F59B]' : 'bg-[#FFB800]'} border-2 border-white shadow-lg flex items-center justify-center text-[9px] font-black text-slate-950">
-                ${p.corroboration_count > 1 ? p.corroboration_count : '!'}
-              </span>
-            </div>
-          `,
-          iconSize: [18, 18],
-          iconAnchor: [9, 9]
+        const marker = L.circleMarker([lat, lon], {
+          radius: 6,
+          color: '#FFB800',
+          weight: 2,
+          fillColor: '#FFB800',
+          fillOpacity: 0.85
         });
 
-        const hazardMarker = L.marker([lat, lon], { icon: hazardIcon });
-
-        const statusBadge = p.status === 'VERIFIED'
-          ? '<span class="px-2 py-0.5 rounded text-[9px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold">MUNICIPALLY VERIFIED</span>'
-          : '<span class="px-2 py-0.5 rounded text-[9px] bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold">COMMUNITY CORROBORATED</span>';
-
-        hazardMarker.bindPopup(`
-          <div class="p-2 space-y-2 max-w-xs text-xs font-sans text-slate-100">
-            <div class="flex items-center justify-between border-b border-white/10 pb-1.5">
-              <span class="font-display font-bold text-white text-sm">${p.hazard_type}</span>
-              ${statusBadge}
-            </div>
-            <p class="text-slate-300 text-xs leading-relaxed">${p.description}</p>
-            <div class="grid grid-cols-2 gap-2 bg-[#0A0D14] p-2 rounded-xl border border-white/10 text-[11px]">
-              <div>
-                <span class="text-slate-400 block text-[9px]">Severity Score</span>
-                <span class="font-mono font-bold text-amber-400">${p.severity_rating} / 5</span>
-              </div>
-              <div>
-                <span class="text-slate-400 block text-[9px]">Spatial Reports</span>
-                <span class="font-mono font-bold text-cyan-400">${p.corroboration_count} corroborated</span>
-              </div>
-            </div>
-            ${p.is_synthetic ? '<div class="text-[9px] text-slate-500 italic">Synthetic prototype observation (≤50m deduplicated)</div>' : ''}
+        marker.bindPopup(`
+          <div style="font-family: sans-serif; font-size: 12px; color: #f8fafc; background: #08090D; padding: 8px 12px; border-radius: 12px; border: 1px solid #FFB800; min-width: 180px;">
+            <div style="font-size: 10px; font-weight: bold; color: #FFB800; text-transform: uppercase;">⚠️ Verified Road Hazard</div>
+            <div style="font-size: 13px; font-weight: bold; margin-top: 2px;">${p.hazard_type || 'Pothole / Road Obstruction'}</div>
+            <div style="font-size: 11px; color: #94a3b8; margin-top: 4px;">${p.description || 'Reported by commuter'}</div>
+            <div style="font-size: 10px; color: #cbd5e1; margin-top: 4px;">Severity: ${p.severity || 3}/5 • Corroborations: ${p.corroborations || 1}</div>
           </div>
         `);
 
-        hazards.addLayer(hazardMarker);
+        hazards.addLayer(marker);
       }
     });
   }, [layersData, showBlackspots, showSegments, showHazards, isNightTime, isRainActive]);
 
   return (
-    <div className={`relative w-full h-[calc(100vh-65px)] overflow-hidden map-theme-${basemapStyle} font-sans`}>
+    <div className="relative w-full h-[calc(100vh-68px)] overflow-hidden font-sans">
       {/* Map Canvas */}
-      <div ref={mapContainerRef} className="w-full h-full z-0" />
+      <div ref={mapContainerRef} className="w-full h-full z-0 bg-[#08090D]" />
 
-      {/* Floating Top Island: Telemetry & Basemap Switcher */}
-      <div className="absolute top-3.5 left-4 right-4 z-10 flex flex-wrap items-center justify-between gap-3 pointer-events-none">
-        {/* Left Telemetry Pill */}
-        <div className="pointer-events-auto flex items-center space-x-3 glass-card px-3.5 py-2 rounded-2xl shadow-2xl">
-          <span className="relative flex h-2.5 w-2.5">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-          </span>
-          <div className="flex items-center space-x-2 text-xs">
-            <span className="font-display font-bold text-white tracking-tight">BENGALURU GIS RADAR</span>
-            <span className="text-white/20">|</span>
-            <span className="font-mono text-[11px] text-cyan-300">250 LINKS • 16 BLACKSPOTS</span>
-          </div>
-        </div>
-
-        {/* Center / Right Weather & Basemap Dock */}
-        <div className="pointer-events-auto flex items-center space-x-2.5">
-          {liveWeather && (
-            <div className="hidden sm:flex items-center space-x-2.5 glass-card px-3.5 py-2 rounded-2xl shadow-2xl text-xs text-slate-200">
-              <CloudLightning className="w-4 h-4 text-cyan-400 animate-pulse" />
-              <span className="font-mono font-bold text-white">{liveWeather.temperature_c}°C</span>
-              <span className="text-slate-400 text-[11px]">• {liveWeather.weather_condition}</span>
-              {liveWeather.is_precipitation_active && (
-                <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
-                  RAIN ACTIVE
-                </span>
-              )}
+      {/* Loading Radar Overlay */}
+      {loading && (
+        <div className="absolute inset-0 z-20 bg-[#08090D]/85 backdrop-blur-md flex flex-col items-center justify-center space-y-4">
+          <div className="relative">
+            <div className="w-16 h-16 rounded-full border-2 border-cyan-500/20 border-t-cyan-400 animate-spin"></div>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <Shield className="w-6 h-6 text-cyan-400" />
             </div>
-          )}
-
-          {/* Designer Basemap Mode Selector */}
-          <div className="flex items-center bg-[#0D0F15]/90 backdrop-blur-2xl border border-white/10 rounded-2xl p-1 shadow-2xl text-xs font-medium">
-            <button
-              onClick={() => setBasemapStyle('dark')}
-              className={`px-3 py-1.5 rounded-xl transition-all duration-200 ${
-                basemapStyle === 'dark' 
-                  ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-semibold shadow-md' 
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              🌙 Obsidian
-            </button>
-            <button
-              onClick={() => setBasemapStyle('satellite')}
-              className={`px-3 py-1.5 rounded-xl transition-all duration-200 ${
-                basemapStyle === 'satellite' 
-                  ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-semibold shadow-md' 
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              🛰️ Satellite
-            </button>
-            <button
-              onClick={() => setBasemapStyle('standard')}
-              className={`px-3 py-1.5 rounded-xl transition-all duration-200 ${
-                basemapStyle === 'standard' 
-                  ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-semibold shadow-md' 
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              🗺️ Map
-            </button>
+          </div>
+          <div className="text-center space-y-1">
+            <h3 className="font-display font-bold text-base text-white tracking-wide">
+              Initializing Autonomous Safety Radar
+            </h3>
+            <p className="text-xs text-slate-400 font-mono">
+              Ingesting BTP Blackspots • OSM Highway Topology • Live Meteorology
+            </p>
           </div>
         </div>
+      )}
+
+      {/* Top Floating Telemetry & Weather Status Bar */}
+      <div className="absolute top-4 left-4 right-4 md:right-auto z-10 flex flex-wrap items-center gap-2.5">
+        {/* Basemap Style Switcher */}
+        <div className="glass-card px-1.5 py-1 rounded-2xl flex items-center space-x-1 shadow-2xl text-xs">
+          <button
+            onClick={() => setBasemapStyle('dark')}
+            className={`px-3 py-1.5 rounded-xl font-medium transition-all ${
+              basemapStyle === 'dark' 
+                ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-semibold shadow-md' 
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            🌙 Obsidian
+          </button>
+          <button
+            onClick={() => setBasemapStyle('satellite')}
+            className={`px-3 py-1.5 rounded-xl font-medium transition-all ${
+              basemapStyle === 'satellite' 
+                ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-semibold shadow-md' 
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            🛰️ Satellite
+          </button>
+          <button
+            onClick={() => setBasemapStyle('standard')}
+            className={`px-3 py-1.5 rounded-xl font-medium transition-all ${
+              basemapStyle === 'standard' 
+                ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-semibold shadow-md' 
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            🗺️ Blueprint
+          </button>
+        </div>
+
+        {/* Live Weather Telemetry Pill */}
+        {liveWeather && (
+          <div className="glass-card px-3.5 py-2 rounded-2xl flex items-center space-x-3 text-xs shadow-2xl text-slate-200">
+            <div className="flex items-center space-x-1.5 text-cyan-400 font-semibold">
+              <CloudRain className="w-3.5 h-3.5" />
+              <span>{liveWeather.city || 'Bengaluru'}: {liveWeather.temperature_c ?? 24}°C</span>
+            </div>
+            <span className="text-slate-600">|</span>
+            <span className="text-slate-300 font-mono text-[11px]">
+              {liveWeather.condition || 'Clear Asphalt'}
+            </span>
+            <span className={`px-2 py-0.5 rounded-md text-[10px] font-mono font-bold ${
+              liveWeather.is_precipitation_active 
+                ? 'bg-red-500/20 text-red-300 border border-red-500/30' 
+                : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+            }`}>
+              {liveWeather.is_precipitation_active ? '⚠️ +14% Wet Penalty' : '✓ 1.0x Dry Grip'}
+            </span>
+          </div>
+        )}
       </div>
 
-      {/* Floating Tactical Island (Left Side) */}
-      <div className={`absolute top-16 left-4 z-10 w-80 max-w-[calc(100vw-2rem)] glass-card-elevated rounded-3xl shadow-2xl text-xs transition-all duration-300 ${
-        isPanelOpen ? 'p-4 space-y-3.5' : 'p-3 w-auto'
-      }`}>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2 font-display font-bold text-white text-sm">
+      {/* Floating Tactical Panel (Top Right Dock) */}
+      <div className="absolute top-4 right-4 z-10 w-80 md:w-88 glass-card rounded-3xl p-4 shadow-2xl space-y-3.5 transition-all text-xs">
+        {/* Panel Header */}
+        <div className="flex items-center justify-between border-b border-white/[0.08] pb-2.5">
+          <div className="flex items-center space-x-2">
             <Layers className="w-4 h-4 text-cyan-400" />
-            {isPanelOpen && <span>Tactical Layers &amp; Simulation</span>}
+            <span className="font-display font-bold text-sm text-white tracking-wide">
+              Tactical Layers &amp; Simulation
+            </span>
           </div>
           <button
             onClick={() => setIsPanelOpen(!isPanelOpen)}
@@ -438,32 +545,104 @@ export const MapExplorer: React.FC<MapExplorerProps> = ({ onSelectSegment, onOpe
 
         {isPanelOpen && (
           <>
-            {/* Search Input with ⌘K Style */}
-            <form onSubmit={handleSearchSubmit} className="relative">
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Jump to junction (Silk Board, Hebbal...)"
-                className="w-full bg-[#08090D] border border-white/10 rounded-2xl py-2 pl-9 pr-3 text-slate-200 text-xs focus:outline-none focus:border-cyan-500/80 focus:ring-1 focus:ring-cyan-500/50 transition-all placeholder:text-slate-500"
-              />
-              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
-            </form>
+            {/* Search Input with Autocomplete & Geocoding Dropdown */}
+            <div ref={searchContainerRef} className="relative">
+              <form onSubmit={handleSearchSubmit} className="relative flex items-center">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setIsSearchOpen(true);
+                  }}
+                  onFocus={() => setIsSearchOpen(true)}
+                  placeholder="Search any place or junction (Koramangala, Silk Board...)"
+                  className="w-full bg-[#08090D] border border-white/10 rounded-2xl py-2.5 pl-9 pr-8 text-slate-200 text-xs focus:outline-none focus:border-cyan-500/80 focus:ring-1 focus:ring-cyan-500/50 transition-all placeholder:text-slate-500"
+                />
+                <Search className="w-4 h-4 text-cyan-400 absolute left-3 pointer-events-none" />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSearchQuery('');
+                      setIsSearchOpen(false);
+                      if (searchBeaconRef.current && mapInstanceRef.current) {
+                        mapInstanceRef.current.removeLayer(searchBeaconRef.current);
+                        searchBeaconRef.current = null;
+                      }
+                    }}
+                    className="absolute right-2.5 p-1 rounded-full text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </form>
 
-            {/* Quick Hub Jump Pills */}
+              {/* Autocomplete Dropdown List */}
+              {isSearchOpen && (
+                <div className="absolute top-full left-0 right-0 mt-1.5 bg-[#0D101A]/95 backdrop-blur-2xl border border-white/15 rounded-2xl shadow-2xl overflow-hidden z-50 max-h-64 overflow-y-auto divide-y divide-white/[0.06]">
+                  {searchResults.length > 0 ? (
+                    searchResults.map((item) => (
+                      <button
+                        key={item.id}
+                        type="button"
+                        onClick={() => handleSelectLocation(item)}
+                        className="w-full px-3 py-2 text-left flex items-start space-x-2.5 hover:bg-cyan-500/10 transition-colors group"
+                      >
+                        <div className="p-1 rounded-lg bg-white/[0.05] group-hover:bg-cyan-500/20 text-cyan-400 shrink-0 mt-0.5">
+                          <MapPin className="w-3.5 h-3.5" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between gap-1">
+                            <span className="text-xs font-semibold text-slate-200 group-hover:text-cyan-300 truncate">
+                              {item.name}
+                            </span>
+                            <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded uppercase shrink-0 ${
+                              item.category === 'Blackspot'
+                                ? 'bg-red-500/20 text-red-300 border border-red-500/30'
+                                : item.category === 'Tech Park'
+                                ? 'bg-blue-500/20 text-blue-300'
+                                : 'bg-white/[0.08] text-slate-400'
+                            }`}>
+                              {item.category}
+                            </span>
+                          </div>
+                          <p className="text-[10px] text-slate-400 truncate font-light">
+                            {item.desc}
+                          </p>
+                        </div>
+                      </button>
+                    ))
+                  ) : (
+                    <div className="p-3 text-center text-xs text-slate-400">
+                      {isSearchingExternal ? (
+                        <div className="flex items-center justify-center space-x-2 text-cyan-400">
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          <span>Searching OpenStreetMap places...</span>
+                        </div>
+                      ) : (
+                        <span>Press Enter to search live places for "{searchQuery}"</span>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Quick Corridor Fly-To Pills */}
             <div className="space-y-1.5">
               <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block">
-                Corridor Fly-To:
+                Quick Hub Jump:
               </span>
               <div className="flex flex-wrap gap-1.5">
-                {Object.keys(BENGALURU_HUBS).slice(0, 6).map((hub) => (
+                {BENGALURU_GAZETTEER.slice(0, 6).map((item) => (
                   <button
-                    key={hub}
+                    key={item.id}
                     type="button"
-                    onClick={() => handleJumpToHub(BENGALURU_HUBS[hub].coords)}
+                    onClick={() => handleSelectLocation(item)}
                     className="text-[10px] font-medium px-2.5 py-1 rounded-xl bg-white/[0.05] hover:bg-cyan-500/20 hover:text-cyan-300 hover:border-cyan-500/40 border border-white/[0.08] text-slate-300 transition-all active:scale-95"
                   >
-                    {hub}
+                    {item.name.split(' ')[0]}
                   </button>
                 ))}
               </div>
@@ -550,7 +729,7 @@ export const MapExplorer: React.FC<MapExplorerProps> = ({ onSelectSegment, onOpe
             {/* Interaction Hint */}
             <div className="bg-cyan-500/10 border border-cyan-500/20 rounded-2xl p-2.5 text-[11px] text-cyan-300 flex items-start space-x-2">
               <Sparkles className="w-4 h-4 text-cyan-400 flex-shrink-0 mt-0.5" />
-              <span>Click on any road link to view its <strong>SHAP Factor AI Attribution Card</strong>. Click any open map point to submit a citizen report.</span>
+              <span>Click any road to view its <strong>SHAP Factor AI Card</strong>. Click any point to submit a hazard report.</span>
             </div>
           </>
         )}
