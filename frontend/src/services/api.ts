@@ -6,7 +6,8 @@ import {
   FALLBACK_OGD_PORTAL, 
   FALLBACK_ROUTE_EVALUATION, 
   simulateFallbackRisk, 
-  getFallbackSegmentRiskCard 
+  getFallbackSegmentRiskCard,
+  calculateClientRouteEvaluation
 } from '../data/fallbackData';
 
 const BASE_URL = ((import.meta as any).env?.VITE_API_BASE_URL as string) || '';
@@ -190,7 +191,7 @@ export const api = {
       });
       if (res.ok) return await res.json();
     } catch (_) {}
-    return FALLBACK_ROUTE_EVALUATION;
+    return calculateClientRouteEvaluation(origin, destination);
   },
 
   async getAnalyticsOverview() {
