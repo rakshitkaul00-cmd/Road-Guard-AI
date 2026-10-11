@@ -308,10 +308,16 @@ export const RouteComparison: React.FC = () => {
 
     L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-    // Dark map tiles
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 18
+    // Dark map tiles from CartoDB CDN (fast, unblocked, native dark)
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      subdomains: 'abcd',
+      maxZoom: 19,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
     }).addTo(map);
+
+    setTimeout(() => {
+      map.invalidateSize();
+    }, 200);
 
     markerGroupRef.current.addTo(map);
     mapInstanceRef.current = map;

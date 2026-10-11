@@ -166,29 +166,44 @@ export const MapExplorer: React.FC<MapExplorerProps> = ({ onSelectSegment, onOpe
   const [isNightTime, setIsNightTime] = useState(0);
   const [isRainActive, setIsRainActive] = useState(0);
 
-  // Switch Tile Layer dynamically
+  // Switch Tile Layer dynamically across all 4 map styles
   const updateTileLayer = (style: BasemapStyle, map: L.Map) => {
-    if (tileLayerRef.current) {
+    if (tileLayerRef.current && map.hasLayer(tileLayerRef.current)) {
       map.removeLayer(tileLayerRef.current);
     }
 
     if (style === 'satellite') {
+      // 🛰️ Satellite: High-Resolution Esri Aerial Imagery
       tileLayerRef.current = L.tileLayer(
         'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
         {
           attribution: '&copy; Esri &mdash; High-Resolution Aerial Satellite',
           maxZoom: 18
         }
-      ).addTo(map);
-    } else {
+      );
+    } else if (style === 'standard') {
+      // 🗺️ Blueprint: Clean, High-Contrast CartoDB Voyager Streets
       tileLayerRef.current = L.tileLayer(
-        'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+        'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
         {
-          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-          maxZoom: 19
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+          subdomains: 'abcd',
+          maxZoom: 20
         }
-      ).addTo(map);
+      );
+    } else {
+      // 🌙 Obsidian & 🔥 Heatmap: High-Performance CartoDB Dark Matter
+      tileLayerRef.current = L.tileLayer(
+        'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+        {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+          subdomains: 'abcd',
+          maxZoom: 20
+        }
+      );
     }
+
+    tileLayerRef.current.addTo(map);
   };
 
   // Close search suggestions on click outside
@@ -225,6 +240,10 @@ export const MapExplorer: React.FC<MapExplorerProps> = ({ onSelectSegment, onOpe
       onOpenReportAtCoord(lat, lng);
     });
 
+    setTimeout(() => {
+      map.invalidateSize();
+    }, 200);
+
     mapInstanceRef.current = map;
 
     return () => {
@@ -241,6 +260,9 @@ export const MapExplorer: React.FC<MapExplorerProps> = ({ onSelectSegment, onOpe
   useEffect(() => {
     if (mapInstanceRef.current) {
       updateTileLayer(basemapStyle, mapInstanceRef.current);
+      setTimeout(() => {
+        mapInstanceRef.current?.invalidateSize();
+      }, 100);
     }
   }, [basemapStyle]);
 
