@@ -173,32 +173,33 @@ export const MapExplorer: React.FC<MapExplorerProps> = ({ onSelectSegment, onOpe
     }
 
     if (style === 'satellite') {
-      // 🛰️ Satellite: High-Resolution Esri Aerial Imagery
+      // 🛰️ Satellite: High-Resolution Esri Aerial Imagery (No API key, unwatermarked)
       tileLayerRef.current = L.tileLayer(
         'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
         {
           attribution: '&copy; Esri &mdash; High-Resolution Aerial Satellite',
-          maxZoom: 18
+          maxZoom: 19,
+          maxNativeZoom: 18
         }
       );
     } else if (style === 'standard') {
-      // 🗺️ Blueprint: Clean, High-Contrast CartoDB Voyager Streets
+      // 🗺️ Blueprint: Clean, High-Detail Esri World Street Map (No API key, unwatermarked)
       tileLayerRef.current = L.tileLayer(
-        'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+        'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
         {
-          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-          subdomains: 'abcd',
-          maxZoom: 20
+          attribution: '&copy; Esri &mdash; StreetMap & Transport',
+          maxZoom: 19,
+          maxNativeZoom: 18
         }
       );
     } else {
-      // 🌙 Obsidian & 🔥 Heatmap: High-Performance CartoDB Dark Matter
+      // 🌙 Obsidian & 🔥 Heatmap: Native Pitch-Dark Esri Dark Gray Canvas (No API key, unwatermarked)
       tileLayerRef.current = L.tileLayer(
-        'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+        'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
         {
-          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-          subdomains: 'abcd',
-          maxZoom: 20
+          attribution: '&copy; Esri &mdash; Dark Gray Canvas',
+          maxZoom: 19,
+          maxNativeZoom: 16
         }
       );
     }

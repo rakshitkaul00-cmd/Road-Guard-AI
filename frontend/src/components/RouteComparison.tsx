@@ -308,11 +308,11 @@ export const RouteComparison: React.FC = () => {
 
     L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-    // Dark map tiles from CartoDB CDN (fast, unblocked, native dark)
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      subdomains: 'abcd',
+    // Dark map tiles from Esri Dark Gray Canvas CDN (fast, unblocked, no watermark, no API key)
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
       maxZoom: 19,
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+      maxNativeZoom: 16,
+      attribution: '&copy; Esri &mdash; Dark Gray Canvas'
     }).addTo(map);
 
     setTimeout(() => {
