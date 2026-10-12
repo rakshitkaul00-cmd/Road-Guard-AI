@@ -166,45 +166,39 @@ export const MapExplorer: React.FC<MapExplorerProps> = ({ onSelectSegment, onOpe
   const [isNightTime, setIsNightTime] = useState(0);
   const [isRainActive, setIsRainActive] = useState(0);
 
-  // Switch Tile Layer dynamically across all 4 map styles
+  // Switch Tile Layer dynamically across all 4 map styles using in-place setUrl
   const updateTileLayer = (style: BasemapStyle, map: L.Map) => {
-    if (tileLayerRef.current && map.hasLayer(tileLayerRef.current)) {
-      map.removeLayer(tileLayerRef.current);
-    }
+    let url = 'https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png';
+    let maxNativeZoom = 19;
+    let attribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Tiles by <a href="https://www.hotosm.org/">HOT</a>';
 
     if (style === 'satellite') {
-      // 🛰️ Satellite: High-Resolution Esri Aerial Imagery (No API key, unwatermarked)
-      tileLayerRef.current = L.tileLayer(
-        'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-        {
-          attribution: '&copy; Esri &mdash; High-Resolution Aerial Satellite',
-          maxZoom: 19,
-          maxNativeZoom: 18
-        }
-      );
-    } else if (style === 'standard') {
-      // 🗺️ Blueprint: Clean, High-Detail Esri World Street Map (No API key, unwatermarked)
-      tileLayerRef.current = L.tileLayer(
-        'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
-        {
-          attribution: '&copy; Esri &mdash; StreetMap & Transport',
-          maxZoom: 19,
-          maxNativeZoom: 18
-        }
-      );
-    } else {
-      // 🌙 Obsidian & 🔥 Heatmap: Native Pitch-Dark Esri Dark Gray Canvas (No API key, unwatermarked)
-      tileLayerRef.current = L.tileLayer(
-        'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
-        {
-          attribution: '&copy; Esri &mdash; Dark Gray Canvas',
-          maxZoom: 19,
-          maxNativeZoom: 16
-        }
-      );
+      url = 'https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
+      maxNativeZoom = 18;
+      attribution = '&copy; Esri &mdash; High-Resolution Aerial Satellite';
     }
 
-    tileLayerRef.current.addTo(map);
+    if (!tileLayerRef.current) {
+      const layer = L.tileLayer(url, {
+        maxZoom: 19,
+        maxNativeZoom,
+        subdomains: ['a', 'b'],
+        attribution,
+        crossOrigin: true
+      });
+      layer.on('tileerror', (e: any) => {
+        if (e.tile && !e.tile.dataset.fallback) {
+          e.tile.dataset.fallback = '1';
+          const c = e.coords;
+          if (c) e.tile.src = `https://a.tile.openstreetmap.fr/hot/${c.z}/${c.x}/${c.y}.png`;
+        }
+      });
+      tileLayerRef.current = layer;
+      layer.addTo(map);
+    } else {
+      tileLayerRef.current.options.maxNativeZoom = maxNativeZoom;
+      tileLayerRef.current.setUrl(url);
+    }
   };
 
   // Close search suggestions on click outside
@@ -651,8 +645,10 @@ export const MapExplorer: React.FC<MapExplorerProps> = ({ onSelectSegment, onOpe
 
   return (
     <div className="relative w-full h-[calc(100vh-68px)] overflow-hidden font-sans">
-      {/* Map Canvas with Obsidian Cyberpunk Theme */}
-      <div ref={mapContainerRef} className={`w-full h-full z-0 bg-[#08090D] map-theme-${basemapStyle}`} />
+      {/* Map Canvas with Obsidian Cyberpunk Theme Wrapper */}
+      <div className={`w-full h-full z-0 map-theme-${basemapStyle}`}>
+        <div ref={mapContainerRef} className="w-full h-full bg-[#08090D]" />
+      </div>
 
       {/* Loading Radar Overlay */}
       {loading && (

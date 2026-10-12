@@ -106,9 +106,14 @@
   font-family: 'Plus Jakarta Sans', sans-serif !important;
 }
 
-/* Custom Basemap Filters (Optimized for CartoDB CDN & Esri World Imagery) */
+.map-theme-standard.leaflet-container,
+.map-theme-standard .leaflet-container {
+  background: #f1f5f9 !important;
+}
+
+/* Custom Basemap Filters (Optimized for 100% unblocked, unwatermarked OSM & Esri tiles) */
 .map-theme-dark .leaflet-tile-pane {
-  filter: brightness(98%) contrast(106%);
+  filter: invert(100%) hue-rotate(180deg) brightness(85%) contrast(120%) saturate(70%);
 }
 
 .map-theme-satellite .leaflet-tile-pane {
@@ -116,11 +121,11 @@
 }
 
 .map-theme-standard .leaflet-tile-pane {
-  filter: none;
+  filter: contrast(105%) saturate(110%);
 }
 
 .map-theme-heatmap .leaflet-tile-pane {
-  filter: brightness(86%) contrast(125%);
+  filter: invert(100%) hue-rotate(180deg) brightness(65%) contrast(140%) saturate(50%);
 }
 
 

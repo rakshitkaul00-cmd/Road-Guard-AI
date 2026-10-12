@@ -308,11 +308,12 @@ export const RouteComparison: React.FC = () => {
 
     L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-    // Dark map tiles from Esri Dark Gray Canvas CDN (fast, unblocked, no watermark, no API key)
-    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+    // Crisp dark street map using OpenStreetMap France HOT with CSS dark filter
+    L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
       maxZoom: 19,
-      maxNativeZoom: 16,
-      attribution: '&copy; Esri &mdash; Dark Gray Canvas'
+      subdomains: ['a', 'b'],
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      crossOrigin: true
     }).addTo(map);
 
     setTimeout(() => {
