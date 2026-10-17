@@ -642,7 +642,7 @@ export const RouteComparison: React.FC = () => {
           </div>
         </div>
 
-        <div className="relative w-full h-80 md:h-96 rounded-2xl overflow-hidden border border-white/10 map-theme-dark">
+        <div className="relative isolate z-0 w-full h-80 md:h-96 rounded-2xl overflow-hidden border border-white/10 map-theme-dark">
           <div ref={mapContainerRef} className="w-full h-full" />
         </div>
       </div>

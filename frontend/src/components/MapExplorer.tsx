@@ -646,13 +646,13 @@ export const MapExplorer: React.FC<MapExplorerProps> = ({ onSelectSegment, onOpe
   return (
     <div className="relative w-full h-[calc(100vh-68px)] overflow-hidden font-sans">
       {/* Map Canvas with Obsidian Cyberpunk Theme Wrapper */}
-      <div className={`w-full h-full z-0 map-theme-${basemapStyle}`}>
+      <div className={`relative isolate w-full h-full z-0 map-theme-${basemapStyle}`}>
         <div ref={mapContainerRef} className="w-full h-full bg-[#08090D]" />
       </div>
 
       {/* Loading Radar Overlay */}
       {loading && (
-        <div className="absolute inset-0 z-20 bg-[#08090D]/85 backdrop-blur-md flex flex-col items-center justify-center space-y-4">
+        <div className="absolute inset-0 z-[1100] bg-[#08090D]/85 backdrop-blur-md flex flex-col items-center justify-center space-y-4">
           <div className="relative">
             <div className="w-16 h-16 rounded-full border-2 border-cyan-500/20 border-t-cyan-400 animate-spin"></div>
             <div className="absolute inset-0 flex items-center justify-center">
@@ -671,7 +671,7 @@ export const MapExplorer: React.FC<MapExplorerProps> = ({ onSelectSegment, onOpe
       )}
 
       {/* Top Floating Telemetry & Weather Status Bar */}
-      <div className="absolute top-4 left-4 right-4 md:right-auto z-10 flex flex-wrap items-center gap-2.5">
+      <div className="absolute top-4 left-4 right-4 md:right-auto z-[1000] flex flex-wrap items-center gap-2.5">
         {/* Basemap Style Switcher */}
         <div className="glass-card px-1.5 py-1 rounded-2xl flex flex-wrap items-center space-x-1 shadow-2xl text-xs">
           <button
@@ -740,7 +740,7 @@ export const MapExplorer: React.FC<MapExplorerProps> = ({ onSelectSegment, onOpe
       </div>
 
       {/* Floating Tactical Panel (Top Right Dock) */}
-      <div className="absolute top-4 right-4 z-10 w-80 md:w-88 glass-card rounded-3xl p-4 shadow-2xl space-y-3.5 transition-all text-xs">
+      <div className="absolute top-4 right-4 z-[1000] w-80 md:w-88 glass-card rounded-3xl p-4 shadow-2xl space-y-3.5 transition-all text-xs">
         {/* Panel Header */}
         <div className="flex items-center justify-between border-b border-white/[0.08] pb-2.5">
           <div className="flex items-center space-x-2">
@@ -795,7 +795,7 @@ export const MapExplorer: React.FC<MapExplorerProps> = ({ onSelectSegment, onOpe
 
               {/* Autocomplete Dropdown List */}
               {isSearchOpen && (
-                <div className="absolute top-full left-0 right-0 mt-1.5 bg-[#0D101A]/95 backdrop-blur-2xl border border-white/15 rounded-2xl shadow-2xl overflow-hidden z-50 max-h-64 overflow-y-auto divide-y divide-white/[0.06]">
+                <div className="absolute top-full left-0 right-0 mt-1.5 bg-[#0D101A]/98 backdrop-blur-2xl border border-white/20 rounded-2xl shadow-2xl overflow-hidden z-[1050] max-h-64 overflow-y-auto divide-y divide-white/[0.06]">
                   {searchResults.length > 0 ? (
                     searchResults.map((item) => (
                       <button
@@ -972,7 +972,7 @@ export const MapExplorer: React.FC<MapExplorerProps> = ({ onSelectSegment, onOpe
       </div>
 
       {/* Floating Tactical Legend (Bottom Left Dock) */}
-      <div className="absolute bottom-4 left-4 z-10 glass-card px-4 py-3 rounded-2xl shadow-2xl text-[11px] space-y-1.5 hidden md:block">
+      <div className="absolute bottom-4 left-4 z-[1000] glass-card px-4 py-3 rounded-2xl shadow-2xl text-[11px] space-y-1.5 hidden md:block">
         {basemapStyle === 'heatmap' || showHeatmap ? (
           <>
             <div className="flex items-center justify-between text-slate-200 font-display font-bold border-b border-white/10 pb-1.5 gap-4">
